@@ -185,37 +185,3 @@ After changes:
 ```bash
 nix profile upgrade '.*'
 ```
-
-## Features Highlights
-
-### Neovim
-- **LSP**: Auto-completion, go-to-definition, diagnostics (Mason manages servers)
-- **Treesitter**: Advanced syntax highlighting
-- **Catppuccin**: Beautiful, consistent theme
-- **Harpoon**: Fast file navigation
-- **Auto-format**: Configurable per-filetype
-
-### Ghostty Terminal
-- Catppuccin Mocha theme matching Neovim
-- Vim-style split navigation (Ctrl+H/J/K/L)
-- GPU-accelerated rendering
-- Fish shell integration
-
-### Fish Shell
-- Auto-suggestions based on history
-- Syntax highlighting
-- Modern utilities pre-configured
-- GitHub CLI shortcuts
-- mise integration for runtime management
-
-## Cross-Platform Support
-
-Works on:
-- x86_64-linux
-- aarch64-linux (ARM Linux)
-- x86_64-darwin (Intel Mac)
-- aarch64-darwin (Apple Silicon)
-
-## Documentation
-
-For detailed architecture and development guidance, see [CLAUDE.md](CLAUDE.md).
