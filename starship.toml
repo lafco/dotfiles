@@ -1,0 +1,45 @@
+# Starship prompt configuration
+
+# Get editor completions based on the config schema
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Format configuration
+format = """
+[┌─](bold green)$directory$git_branch$git_status
+[└─](bold green)$character"""
+
+# Wait 10 milliseconds for starship to check files under the current directory
+scan_timeout = 10
+
+# Disable the blank line at the start of the prompt
+add_newline = true
+
+[character]
+success_symbol = "[➜](bold green)"
+error_symbol = "[➜](bold red)"
+
+[directory]
+style = "bold cyan"
+truncation_length = 3
+truncate_to_repo = true
+
+[git_branch]
+symbol = " "
+style = "bold purple"
+
+[git_status]
+style = "bold yellow"
+conflicted = "🏳"
+ahead = "⇡${count}"
+behind = "⇣${count}"
+diverged = "⇕⇡${ahead_count}⇣${behind_count}"
+untracked = "?"
+stashed = "$"
+modified = "!"
+staged = "[++\($count\)](green)"
+renamed = "»"
+deleted = "✘"
+
+[nix_shell]
+symbol = " "
+format = '[$symbol$state]($style) '
