@@ -8,6 +8,9 @@ return {
     init = function()
       vim.cmd.colorscheme "catppuccin"
     end,
+    opts = {
+      term_colors = true,
+    }
   },
   {
     "olimorris/onedarkpro.nvim",
@@ -28,5 +31,8 @@ return {
     init = function()
       vim.cmd.colorscheme "gruvbox"
     end,
+    opts = {
+      term_colors = true,
+    }
   }
 }

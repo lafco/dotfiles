@@ -1,5 +1,5 @@
 frame = "none"
 
 [font]
-normal = ["Jetbrains Mono"]
+normal = ["JetBrainsMono NF"]
 size = 11.0
