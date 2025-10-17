@@ -1,0 +1,11 @@
+# Lock files
+*-lock.*
+*-lock.json
+*.lock
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+composer.lock
+Gemfile.lock
+poetry.lock
+Cargo.lock

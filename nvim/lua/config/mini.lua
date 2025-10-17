@@ -12,8 +12,8 @@ M.files = {
     max_number = math.huge,
     preview = false,
     width_focus = 30,
-    width_nofocus = 20,
-    width_preview = 25,
+    width_nofocus = 30,
+    width_preview = 40,
   },
 }
 
@@ -28,8 +28,10 @@ M.pick = {
     use_cache = true,
   },
   window = {
-    width = 0.2,
-    height = 0.2,
+    config = {
+      width = 80,
+      height = 20,
+    }
   },
   mappings = {
     choose_marked = "<C-CR>"
@@ -84,9 +86,16 @@ M.clue = {
     { mode = "x", keys = "z" },
   },
   window = {
-    delay = 700
+    delay = 500
   },
   clues = {
+    { mode = 'n', keys = '<Leader>f', desc = '+Find' },
+    { mode = 'n', keys = '<Leader>b', desc = '+Buffer' },
+    { mode = 'n', keys = '<Leader>g', desc = '+Git' },
+    { mode = 'n', keys = '<Leader>l', desc = '+Language' },
+    { mode = 'n', keys = '<Leader>s', desc = '+Session' },
+    { mode = 'x', keys = '<Leader>g', desc = '+Git' },
+    { mode = 'x', keys = '<Leader>l', desc = '+Language' },
     miniclue.gen_clues.builtin_completion(),
     miniclue.gen_clues.g(),
     miniclue.gen_clues.marks(),
@@ -106,13 +115,13 @@ M.diff = {
 }
 
 M.surround = {
-   mappings = {
-    add = 'sa', -- Add surrounding in Normal and Visual modes
-    delete = 'sd', -- Delete surrounding
-    find = 'sf', -- Find surrounding (to the right)
-    find_left = 'sF', -- Find surrounding (to the left)
-    highlight = 'sh', -- Highlight surrounding
-    replace = 'sr', -- Replace surrounding
+  mappings = {
+    add = 'sa',        -- Add surrounding in Normal and Visual modes
+    delete = 'sd',     -- Delete surrounding
+    find = 'sf',       -- Find surrounding (to the right)
+    find_left = 'sF',  -- Find surrounding (to the left)
+    highlight = 'sh',  -- Highlight surrounding
+    replace = 'sr',    -- Replace surrounding
     suffix_last = 'p', -- Suffix to search with "prev" method
     suffix_next = 'n', -- Suffix to search with "next" method
   },

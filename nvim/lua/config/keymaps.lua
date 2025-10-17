@@ -4,18 +4,6 @@ local function map(mode, keys, action, desc)
 	vim.keymap.set(mode, keys, action, opts)
 end
 
--- _G.Config.leader_group_clues = {
---   { mode = 'n', keys = '<Leader>b', desc = '+Buffer' },
---   { mode = 'n', keys = '<Leader>e', desc = '+Explore/Edit' },
---   { mode = 'n', keys = '<Leader>f', desc = '+Find' },
---   { mode = 'n', keys = '<Leader>g', desc = '+Git' },
---   { mode = 'n', keys = '<Leader>l', desc = '+Language' },
---   { mode = 'n', keys = '<Leader>s', desc = '+Session' },
---   { mode = 'n', keys = '<Leader>v', desc = '+Visits' },
---   { mode = 'x', keys = '<Leader>g', desc = '+Git' },
---   { mode = 'x', keys = '<Leader>l', desc = '+Language' },
--- }
-
 local M = {}
 M.map = map
 
@@ -76,8 +64,9 @@ M.mini = function()
     builtin.grep_live()
   end, "Grep live")
 	map("n", "<leader>fw", function()
-    builtin.grep_pattern()
-  end, "Grep pattern")
+		local current_word = vim.fn.expand("<cword>")
+    builtin.grep({ pattern = current_word })
+  end, "Grep current word")
 
 	-- Buffers
 	map("n", "<leader>bd", function()
@@ -98,7 +87,7 @@ M.mini = function()
     local _ = require("mini.files").close() or require("mini.files").open()
   end, "Toggle minifiles")
   map("n", "<A-q>", function()
-    miniextra.pickers.visit_paths { filter = "todo" }
+    miniextra.pickers.visit_paths { filter = "marked" }
   end, "Open visits")
   map("n", "<A-a>", function()
     minivisits.add_label "marked"
@@ -140,10 +129,10 @@ M.snacks = function()
 	end, "Scratch pad")
 	map({ "n" }, "<leader>F", function()
 		snacks.picker.pick("files")
-	end, "Find files")
+	end, "Files in directory")
 	map({ "n" }, "<leader>R", function()
 		snacks.picker.pick("recent")
-	end, "Find recent files")
+	end, "Recent files")
 	map({ "n", "t" }, "<A-t>", function()
 		snacks.terminal()
 	end, "Toggle terminal buffer")
@@ -191,18 +180,18 @@ M.lsp = function()
 
 	-- Rename the variable under your cursor.
 	--  Most Language Servers support renaming across files, etc.
-	map("n", "gr", function()
+	map("n", "<leader>lr", function()
 		vim.lsp.buf.rename()
-	end, "Rename")
+	end, "Rename across files")
 
 	-- Execute a code action, usually your cursor needs to be on top of an error
 	-- or a suggestion from your LSP for this to activate.
-	map("n", "<leader>ca", function()
+	map("n", "<leader>la", function()
 		vim.lsp.buf.code_action()
-	end, "Code action")
+	end, "Code actions")
 
 	-- Format current buffer
-	map("n", "<leader>cf", function()
+	map("n", "<leader>lf", function()
 		require("conform").format({ lsp_fallback=true })
 	end, "Format document")
 end
