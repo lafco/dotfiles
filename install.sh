@@ -311,6 +311,59 @@ install_system_tools() {
     log_success "System tools installed"
 }
 
+# Install PostgreSQL
+install_postgresql() {
+    log_info "Installing PostgreSQL..."
+    
+    case $PKG_MANAGER in
+        "apt")
+            $INSTALL_CMD postgresql postgresql-contrib
+            # Start and enable PostgreSQL service
+            sudo systemctl start postgresql
+            sudo systemctl enable postgresql
+            ;;
+        "dnf")
+            $INSTALL_CMD postgresql postgresql-server postgresql-contrib
+            # Initialize database and start service
+            sudo postgresql-setup --initdb
+            sudo systemctl start postgresql
+            sudo systemctl enable postgresql
+            ;;
+        "pacman")
+            $INSTALL_CMD postgresql
+            # Initialize database
+            sudo -u postgres initdb -D /var/lib/postgres/data
+            sudo systemctl start postgresql
+            sudo systemctl enable postgresql
+            ;;
+        "zypper")
+            $INSTALL_CMD postgresql postgresql-server postgresql-contrib
+            # Initialize database and start service
+            sudo systemctl start postgresql
+            sudo systemctl enable postgresql
+            ;;
+        "brew")
+            $INSTALL_CMD postgresql
+            # Start PostgreSQL service
+            brew services start postgresql
+            ;;
+    esac
+    
+    # Create a database user with the same name as the current user
+    if [[ "$OS" != "macos" ]]; then
+        log_info "Creating PostgreSQL user: $USER"
+        sudo -u postgres createuser --superuser $USER 2>/dev/null || log_warning "User $USER already exists in PostgreSQL"
+        sudo -u postgres createdb $USER 2>/dev/null || log_warning "Database $USER already exists"
+    else
+        log_info "Creating PostgreSQL user: $USER"
+        createuser --superuser $USER 2>/dev/null || log_warning "User $USER already exists in PostgreSQL"
+        createdb $USER 2>/dev/null || log_warning "Database $USER already exists"
+    fi
+    
+    log_success "PostgreSQL installed and configured"
+    log_info "You can connect to PostgreSQL with: psql"
+}
+
 # Set up configuration files
 setup_configs() {
     log_info "Setting up configuration files..."
@@ -398,9 +451,12 @@ main() {
     install_fonts
     install_gui_apps
     install_system_tools
+    install_postgresql
     setup_configs
     setup_shell_integrations
-    
+
+    chsh -s \$(which fish)
+
     echo ""
     log_success "Installation complete!"
     echo ""
@@ -418,11 +474,16 @@ main() {
     echo "  - Python (latest) via mise" 
     echo "  - Rust (latest stable)"
     echo ""
+    echo "🗄️  Database:"
+    echo "  - PostgreSQL (with user '$USER' created)"
+    echo "  - Connect with: psql"
+    echo ""
     echo "📚 Next steps:"
     echo "  - Restart your terminal or run: source ~/.bashrc"
     echo "  - To set Fish as default shell: chsh -s \$(which fish)"
     echo "  - Run 'mise install' to ensure runtimes are available"
     echo "  - Start Neovim with 'nvim' or GUI with 'neovide'"
+    echo "  - Connect to PostgreSQL with 'psql'"
     echo ""
     echo "🔧 Configuration files are linked to ~/.config/"
     echo "   Edit files in $(pwd) to modify configurations"

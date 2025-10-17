@@ -18,6 +18,7 @@ cd dotfiles
 - **Neovide**: Beautiful GUI frontend for Neovim
 - **mise**: Universal version manager for Node.js, Python, Rust, and more
 - **GitHub CLI (gh)**: Complete GitHub workflow from the command line
+- **PostgreSQL**: Production-ready database with user account setup
 - **LSP Support**: lua-language-server, nixd, and more via Mason
 
 ### Shell Utilities
