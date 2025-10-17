@@ -36,7 +36,6 @@ diverged = "⇕⇡${ahead_count}⇣${behind_count}"
 untracked = "?"
 stashed = "$"
 modified = "!"
-staged = "[++\($count\)](green)"
 renamed = "»"
 deleted = "✘"
 

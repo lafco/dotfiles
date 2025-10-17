@@ -9,3 +9,5 @@ composer.lock
 Gemfile.lock
 poetry.lock
 Cargo.lock
+.claude
+CLAUDE.md
