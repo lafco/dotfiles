@@ -26,6 +26,84 @@ log_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
+# Detect and handle broken PPAs on Ubuntu
+detect_and_fix_broken_ppas() {
+    if [[ "$PKG_MANAGER" == "apt" ]]; then
+        log_info "Checking for broken PPAs..."
+        
+        # Create a temporary file to capture apt update errors
+        local temp_log=$(mktemp)
+        
+        # Run apt update and capture errors
+        if ! sudo apt update 2>"$temp_log"; then
+            log_warning "apt update failed, checking for broken PPAs..."
+            
+            # Parse the error log for broken repositories
+            local broken_repos=()
+            while IFS= read -r line; do
+                if [[ "$line" =~ "não tem um arquivo Release" ]] || [[ "$line" =~ "does not have a Release file" ]] || [[ "$line" =~ "Release file" ]]; then
+                    # Extract repository URL from error message
+                    if [[ "$line" =~ https?://[^[:space:]]+ ]]; then
+                        local repo_url="${BASH_REMATCH[0]}"
+                        broken_repos+=("$repo_url")
+                        log_warning "Found broken repository: $repo_url"
+                    fi
+                fi
+            done < "$temp_log"
+            
+            # Try to disable broken repositories
+            for repo in "${broken_repos[@]}"; do
+                disable_broken_repo "$repo"
+            done
+            
+            # Try apt update again after disabling broken repos
+            if [ ${#broken_repos[@]} -gt 0 ]; then
+                log_info "Retrying apt update after disabling broken repositories..."
+                if sudo apt update; then
+                    log_success "apt update succeeded after fixing broken repositories"
+                else
+                    log_warning "apt update still has issues, but continuing with installation..."
+                fi
+            fi
+        else
+            log_success "Package lists updated successfully"
+        fi
+        
+        # Clean up temp file
+        rm -f "$temp_log"
+    fi
+}
+
+# Disable a broken repository
+disable_broken_repo() {
+    local repo_url="$1"
+    log_info "Attempting to disable broken repository: $repo_url"
+    
+    # Look for source list files that contain this URL
+    local sources_dir="/etc/apt/sources.list.d"
+    if [ -d "$sources_dir" ]; then
+        for file in "$sources_dir"/*.list; do
+            if [ -f "$file" ] && grep -q "$repo_url" "$file"; then
+                local filename=$(basename "$file")
+                log_warning "Disabling broken repository file: $filename"
+                
+                # Create backup and disable the file
+                sudo cp "$file" "$file.broken-backup-$(date +%Y%m%d)"
+                sudo mv "$file" "$file.disabled"
+                
+                log_success "Disabled $filename (backup created)"
+                return 0
+            fi
+        done
+    fi
+    
+    # Also check main sources.list
+    if grep -q "$repo_url" /etc/apt/sources.list 2>/dev/null; then
+        log_warning "Found broken repository in main sources.list"
+        log_info "You may need to manually edit /etc/apt/sources.list to remove: $repo_url"
+    fi
+}
+
 # Detect OS and package manager
 detect_system() {
     if [[ "$OSTYPE" == "linux-gnu"* ]]; then
@@ -77,7 +155,7 @@ install_core_tools() {
     
     case $PKG_MANAGER in
         "apt")
-            $UPDATE_CMD
+            # Package lists already updated in detect_and_fix_broken_ppas
             $INSTALL_CMD curl wget git tree htop unzip jq build-essential
             ;;
         "dnf")
@@ -108,15 +186,15 @@ install_shell_tools() {
     case $PKG_MANAGER in
         "apt")
             # Install from repositories where available
-            $INSTALL_CMD ripgrep fd-find bat exa fish
+            $INSTALL_CMD ripgrep fd-find bat eza fish
             # Install zoxide manually
             curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
             ;;
         "dnf")
-            $INSTALL_CMD ripgrep fd-find bat exa fish zoxide
+            $INSTALL_CMD ripgrep fd-find bat eza fish zoxide
             ;;
         "pacman")
-            $INSTALL_CMD ripgrep fd bat exa fish zoxide fzf
+            $INSTALL_CMD ripgrep fd bat eza fish zoxide fzf
             ;;
         "zypper")
             $INSTALL_CMD ripgrep fd bat fish
@@ -141,7 +219,9 @@ install_shell_tools() {
             "apt")
                 curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
                 echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
-                sudo apt update
+                if ! sudo apt update; then
+                    log_warning "Package update had issues, but continuing..."
+                fi
                 sudo apt install gh
                 ;;
             "dnf")
@@ -161,12 +241,22 @@ install_runtimes() {
     log_info "Installing development runtimes..."
     
     # Install mise (formerly rtx)
-    if ! command -v mise &> /dev/null; then
+    if ! command -v mise &> /dev/null && [ ! -f "$HOME/.local/bin/mise" ]; then
         log_info "Installing mise..."
         curl https://mise.run | sh
-        echo 'eval "$(~/.local/bin/mise activate bash)"' >> ~/.bashrc
-        export PATH="$HOME/.local/bin:$PATH"
+        # Add mise activation to shell profiles
+        if [ -f ~/.bashrc ] && ! grep -q "mise activate" ~/.bashrc; then
+            echo 'eval "$(~/.local/bin/mise activate bash)"' >> ~/.bashrc
+        fi
+        if [ -f ~/.zshrc ] && ! grep -q "mise activate" ~/.zshrc; then
+            echo 'eval "$(~/.local/bin/mise activate zsh)"' >> ~/.zshrc
+        fi
+        # Give mise a moment to finish installation
+        sleep 2
     fi
+    
+    # Ensure mise is in PATH
+    export PATH="$HOME/.local/bin:$PATH"
     
     # Install Rust
     if ! command -v rustc &> /dev/null; then
@@ -175,15 +265,42 @@ install_runtimes() {
         source ~/.cargo/env
     fi
     
+    # Check if mise is available
+    if [ -f "$HOME/.local/bin/mise" ]; then
+        MISE_CMD="$HOME/.local/bin/mise"
+        log_info "Found mise at: $MISE_CMD"
+    elif command -v mise &> /dev/null; then
+        MISE_CMD="mise"
+        log_info "Found mise in PATH: $(which mise)"
+    else
+        log_error "mise installation failed, skipping runtime installation"
+        log_info "Checked: $HOME/.local/bin/mise and PATH"
+        return
+    fi
+    
+    # Verify mise is executable
+    if ! "$MISE_CMD" --version &> /dev/null; then
+        log_error "mise command failed, skipping runtime installation"
+        return
+    fi
+    
     # Install Node.js via mise
     log_info "Installing Node.js LTS via mise..."
-    ~/.local/bin/mise install node@lts
-    ~/.local/bin/mise global node@lts
+    if "$MISE_CMD" install node@lts; then
+        "$MISE_CMD" global node@lts || log_warning "Failed to set Node.js as global"
+        log_success "Node.js LTS installed"
+    else
+        log_warning "Failed to install Node.js"
+    fi
     
     # Install Python via mise
     log_info "Installing Python latest via mise..."
-    ~/.local/bin/mise install python@latest
-    ~/.local/bin/mise global python@latest
+    if "$MISE_CMD" install python@latest; then
+        "$MISE_CMD" global python@latest || log_warning "Failed to set Python as global"
+        log_success "Python latest installed"
+    else
+        log_warning "Failed to install Python"
+    fi
     
     log_success "Development runtimes installed"
 }
@@ -235,13 +352,10 @@ install_gui_apps() {
     
     case $PKG_MANAGER in
         "apt")
-            # Install Neovim
-            if ! command -v nvim &> /dev/null; then
-                log_info "Installing Neovim..."
-                curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
-                chmod u+x nvim.appimage
-                sudo mv nvim.appimage /usr/local/bin/nvim
-            fi
+            log_info "Installing Neovim..."
+            curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.appimage
+            chmod u+x nvim-linux-x86_64.appimage
+            sudo mv nvim-linux-x86_64.appimage /usr/local/bin/nvim
             ;;
         "dnf")
             $INSTALL_CMD neovim
@@ -424,20 +538,76 @@ setup_shell_integrations() {
         fi
     fi
     
-    # Add mise activation to shell profiles
-    if [ -f ~/.bashrc ]; then
-        if ! grep -q "mise activate" ~/.bashrc; then
-            echo 'eval "$(~/.local/bin/mise activate bash)"' >> ~/.bashrc
-        fi
-    fi
-    
-    if [ -f ~/.zshrc ]; then
-        if ! grep -q "mise activate" ~/.zshrc; then
-            echo 'eval "$(~/.local/bin/mise activate zsh)"' >> ~/.zshrc
-        fi
-    fi
-    
     log_success "Shell integrations set up"
+}
+
+# Show usage information
+help() {
+    echo "Usage: $0 [FUNCTION_NAME]"
+    echo ""
+    echo "Available functions:"
+    echo "  core_tools      - Install core development tools (git, curl, etc.)"
+    echo "  shell_tools     - Install modern shell tools (ripgrep, fd, bat, etc.)"
+    echo "  runtimes        - Install development runtimes (Node.js, Python, Rust)"
+    echo "  fonts           - Install fonts (JetBrains Mono, FiraCode Nerd Fonts)"
+    echo "  gui_apps        - Install GUI applications (Neovim, Neovide, Starship)"
+    echo "  system_tools    - Install additional system tools (btop)"
+    echo "  postgresql      - Install and configure PostgreSQL"
+    echo "  configs         - Set up configuration files"
+    echo "  fix_ppas        - Fix broken PPAs (Ubuntu only)"
+    echo ""
+    echo "Examples:"
+    echo "  $0                   # Run full installation"
+    echo "  $0 gui_apps          # Install only GUI applications"
+    echo "  $0 postgresql        # Install only PostgreSQL"
+    echo "  $0 fonts             # Install only fonts"
+    echo ""
+}
+
+# Run a specific function
+run_function() {
+    local func_name="$1"
+    
+    # Always run system detection first
+    detect_system
+    
+    case "$func_name" in
+        "core_tools")
+            detect_and_fix_broken_ppas
+            install_core_tools
+            ;;
+        "shell_tools")
+            install_shell_tools
+            ;;
+        "runtimes")
+            install_runtimes
+            ;;
+        "fonts")
+            install_fonts
+            ;;
+        "gui_apps")
+            install_gui_apps
+            ;;
+        "system_tools")
+            install_system_tools
+            ;;
+        "postgresql")
+            install_postgresql
+            ;;
+        "configs")
+            setup_configs
+            ;;
+        "fix_ppas")
+            detect_and_fix_broken_ppas
+            ;;
+        *)
+            log_error "Unknown function: $func_name"
+            help
+            exit 1
+            ;;
+    esac
+    
+    log_success "Function '$func_name' completed!"
 }
 
 # Main installation function
@@ -445,6 +615,7 @@ main() {
     log_info "Starting dotfiles installation..."
     
     detect_system
+    detect_and_fix_broken_ppas
     install_core_tools
     install_shell_tools
     install_runtimes
@@ -455,7 +626,17 @@ main() {
     setup_configs
     setup_shell_integrations
 
-    chsh -s $(which fish)
+    # Only change shell to fish if it's not already the default
+    if command -v fish &> /dev/null; then
+        CURRENT_SHELL=$(basename "$SHELL")
+        if [[ "$CURRENT_SHELL" != "fish" ]]; then
+            log_info "Setting fish as default shell..."
+            chsh -s $(which fish)
+            log_success "Default shell changed to fish"
+        else
+            log_info "Fish is already the default shell"
+        fi
+    fi
 
     echo ""
     log_success "Installation complete!"
@@ -489,5 +670,19 @@ main() {
     echo "   Edit files in $(pwd) to modify configurations"
 }
 
-# Run main function
-main "$@"
+# Handle command line arguments
+if [ $# -eq 0 ]; then
+    # No arguments - run full installation
+    main "$@"
+elif [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
+    # Show help
+    help
+elif [ $# -eq 1 ]; then
+    # Single argument - run specific function
+    run_function "$1"
+else
+    # Multiple arguments - show usage
+    log_error "Too many arguments"
+    help
+    exit 1
+fi
