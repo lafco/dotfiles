@@ -455,7 +455,7 @@ main() {
     setup_configs
     setup_shell_integrations
 
-    chsh -s \$(which fish)
+    chsh -s $(which fish)
 
     echo ""
     log_success "Installation complete!"
