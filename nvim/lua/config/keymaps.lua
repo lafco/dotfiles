@@ -38,35 +38,38 @@ M.general = function()
 	map("t", "<A-down>", "<C-\\><C-N>:resize -2<CR>")
 	map("t", "<A-left>", "<C-\\><C-N>:vertical resize +2<CR>")
 	map("t", "<A-right>", "<C-\\><C-N>:vertical resize -2<CR>")
+	-- Quickfix list
+	map("n", "<A-n>", "<cmd>cnext<CR>")
+	map("n", "<A-p>", "<cmd>cprev<CR>")
 end
 
 M.mini = function()
-  local minipick = require "mini.pick"
-  local miniextra = require "mini.extra"
-  local minivisits = require "mini.visits"
-  local minidiff = require "mini.diff"
-	local minisession = require "mini.sessions"
-	local minibufremove = require "mini.bufremove"
+	local minipick = require("mini.pick")
+	local miniextra = require("mini.extra")
+	local minivisits = require("mini.visits")
+	local minidiff = require("mini.diff")
+	local minisession = require("mini.sessions")
+	local minibufremove = require("mini.bufremove")
 
-  local builtin = minipick.builtin
+	local builtin = minipick.builtin
 
 	-- Find files and buffers
-  map("n", "<leader>ff", function()
-    builtin.files()
-  end, "Find files")
-  map("n", "<leader>fb", function()
-    builtin.buffers()
-  end, "Find buffers")
-  map("n", "<leader>fr", function()
-    builtin.resume()
-  end, "Resume finding")
-  map("n", "<leader>fg", function()
-    builtin.grep_live()
-  end, "Grep live")
+	map("n", "<leader>ff", function()
+		builtin.files()
+	end, "Find files")
+	map("n", "<leader>fb", function()
+		builtin.buffers()
+	end, "Find buffers")
+	map("n", "<leader>fr", function()
+		builtin.resume()
+	end, "Resume finding")
+	map("n", "<leader>fg", function()
+		builtin.grep_live()
+	end, "Grep live")
 	map("n", "<leader>fw", function()
 		local current_word = vim.fn.expand("<cword>")
-    builtin.grep({ pattern = current_word })
-  end, "Grep current word")
+		builtin.grep({ pattern = current_word })
+	end, "Grep current word")
 
 	-- Buffers
 	map("n", "<leader>bd", function()
@@ -84,28 +87,28 @@ M.mini = function()
 
 	-- Toggle minifiles, buffer remove, visits
 	map("n", "<leader>e", function()
-    local _ = require("mini.files").close() or require("mini.files").open()
-  end, "Toggle minifiles")
-  map("n", "<A-q>", function()
-    miniextra.pickers.visit_paths { filter = "marked" }
-  end, "Open visits")
-  map("n", "<A-a>", function()
-    minivisits.add_label "marked"
-  end, "Add file to visits")
-  map("n", "<A-r>", function()
-    minivisits.remove_label("marked")
-  end, "Remove file from visits")
+		local _ = require("mini.files").close() or require("mini.files").open()
+	end, "Toggle minifiles")
+	map("n", "<A-q>", function()
+		miniextra.pickers.visit_paths({ filter = "marked" })
+	end, "Open visits")
+	map("n", "<A-a>", function()
+		minivisits.add_label("marked")
+	end, "Add file to visits")
+	map("n", "<A-r>", function()
+		minivisits.remove_label("marked")
+	end, "Remove file from visits")
 
 	-- Git
-  map("n", "<leader>gc", function()
-    miniextra.pickers.git_commits()
-  end, "Show git commits")
-  map("n", "<leader>gh", function()
-    miniextra.pickers.git_hunks()
-  end, "Show git hunks")
-  map("n", "<leader>gd", function()
-    minidiff.toggle_overlay(0)
-  end, "Toggle git diff")
+	map("n", "<leader>gc", function()
+		miniextra.pickers.git_commits()
+	end, "Show git commits")
+	map("n", "<leader>gh", function()
+		miniextra.pickers.git_hunks()
+	end, "Show git hunks")
+	map("n", "<leader>gd", function()
+		minidiff.toggle_overlay(0)
+	end, "Toggle git diff")
 
 	-- Session management
 	map("n", "<leader>ss", function()
@@ -145,37 +148,37 @@ M.lsp = function()
 	--  This is where a variable was first declared, or where a function is defined, etc.
 	--  To jump back, press <C-t>.
 	map("n", "gd", function()
-		miniextra.pickers.lsp({ scope = 'definition' })
+		miniextra.pickers.lsp({ scope = "definition" })
 	end, "Source definition")
 
 	-- Find references for the word under your cursor.
 	map("n", "gr", function()
-		miniextra.pickers.lsp({ scope = 'references' })
+		miniextra.pickers.lsp({ scope = "references" })
 	end, "Source references")
 
 	-- Jump to the implementation of the word under your cursor.
 	--  Useful when your language has ways of declaring types without an actual implementation.
 	map("n", "gi", function()
-		miniextra.pickers.lsp({ scope = 'implementation' })
+		miniextra.pickers.lsp({ scope = "implementation" })
 	end, "Source implementation")
 
 	-- Jump to the type of the word under your cursor.
 	--  Useful when you're not sure what type a variable is and you want to see
 	--  the definition of its *type*, not where it was *defined*.
 	map("n", "gt", function()
-		miniextra.pickers.lsp({ scope = 'type_definition' })
+		miniextra.pickers.lsp({ scope = "type_definition" })
 	end, "Source type definition")
 
 	-- Fuzzy find all the symbols in your current document.
 	--  Symbols are things like variables, functions, types, etc.
 	map("n", "<leader>ls", function()
-		miniextra.pickers.lsp({ scope = 'document_symbol' })
+		miniextra.pickers.lsp({ scope = "document_symbol" })
 	end, "Buffer symbols")
 
 	-- Fuzzy find all the symbols in your current workspace.
 	--  Similar to document symbols, except searches over your entire project.
 	map("n", "<leader>lw", function()
-		miniextra.pickers.lsp({ scope = 'workspace_symbol' })
+		miniextra.pickers.lsp({ scope = "workspace_symbol" })
 	end, "Workspace symbols")
 
 	-- Rename the variable under your cursor.
@@ -192,7 +195,7 @@ M.lsp = function()
 
 	-- Format current buffer
 	map("n", "<leader>lf", function()
-		require("conform").format({ lsp_fallback=true })
+		require("conform").format({ lsp_fallback = true })
 	end, "Format document")
 end
 
