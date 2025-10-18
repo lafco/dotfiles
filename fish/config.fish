@@ -89,8 +89,12 @@ if type -q gh
 end
 
 # Editor aliases (run neovide in background without blocking terminal)
+alias nvim 'neovide &; disown'
 alias vim 'neovide &; disown'
-alias vi 'neovide &; disown'
+alias v 'neovide &; disown'
+
+# Create directory and navigate into it
+alias mkcd 'function _mkcd; mkdir -p $argv[1]; and cd $argv[1]; end; _mkcd'
 
 # Ownership and permissions
 alias own 'sudo chown -R $USER:$USER'
