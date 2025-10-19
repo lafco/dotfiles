@@ -1,5 +1,5 @@
 # Fish shell configuration
-
+set fish_greeting ""
 # Set up Starship prompt
 if type -q starship
     starship init fish | source
@@ -12,7 +12,7 @@ end
 
 # Initialize fzf key bindings
 if type -q fzf
-    fzf --fish | source
+    fzf init fish | source
 end
 
 # Initialize mise (development environment manager)
