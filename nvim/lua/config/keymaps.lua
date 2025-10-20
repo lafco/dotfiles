@@ -44,159 +44,88 @@ M.general = function()
 end
 
 M.mini = function()
-	local minipick = require("mini.pick")
 	local miniextra = require("mini.extra")
 	local minivisits = require("mini.visits")
-	local minidiff = require("mini.diff")
 	local minisession = require("mini.sessions")
-	local minibufremove = require("mini.bufremove")
 
-	local builtin = minipick.builtin
-
-	-- Find files and buffers
-	map("n", "<leader>ff", function()
-		builtin.files()
-	end, "Find files")
-	map("n", "<leader>fb", function()
-		builtin.buffers()
-	end, "Find buffers")
-	map("n", "<leader>fr", function()
-		builtin.resume()
-	end, "Resume finding")
-	map("n", "<leader>fg", function()
-		builtin.grep_live()
-	end, "Grep live")
-	map("n", "<leader>fw", function()
-		local current_word = vim.fn.expand("<cword>")
-		builtin.grep({ pattern = current_word })
-	end, "Grep current word")
-
-	-- Buffers
-	map("n", "<leader>bd", function()
-		minibufremove.delete()
-	end, "Delete")
-	map("n", "<leader>bD", function()
-		minibufremove.delete(0, true)
-	end, "Delete!")
-	map("n", "<leader>bw", function()
-		minibufremove.wipeout()
-	end, "Wipeout")
-	map("n", "<leader>bW", function()
-		minibufremove.wipeout(0, true)
-	end, "Wipeout!")
-
-	-- Toggle minifiles, buffer remove, visits
-	map("n", "<leader>e", function()
-		local _ = require("mini.files").close() or require("mini.files").open()
-	end, "Toggle minifiles")
-	map("n", "<A-q>", function()
-		miniextra.pickers.visit_paths({ filter = "marked" })
-	end, "Open visits")
-	map("n", "<A-a>", function()
-		minivisits.add_label("marked")
-	end, "Add file to visits")
-	map("n", "<A-r>", function()
-		minivisits.remove_label("marked")
-	end, "Remove file from visits")
-
-	-- Git
-	map("n", "<leader>gc", function()
-		miniextra.pickers.git_commits()
-	end, "Show git commits")
-	map("n", "<leader>gh", function()
-		miniextra.pickers.git_hunks()
-	end, "Show git hunks")
-	map("n", "<leader>gd", function()
-		minidiff.toggle_overlay(0)
-	end, "Toggle git diff")
+	-- Visits
+	map("n", "<A-z>", function() miniextra.pickers.visit_paths({ filter = "marked" }) end, "Open visits")
+	map("n", "<A-a>", function() minivisits.add_label("marked") end, "Add file to visits")
+	map("n", "<A-r>", function() minivisits.remove_label("marked") end, "Remove file from visits")
 
 	-- Session management
-	map("n", "<leader>ss", function()
-		minisession.write(vim.fn.input("Session name: "))
-	end, "Save")
-	map("n", "<leader>sr", function()
-		minisession.select("read")
-	end, "Read")
-	map("n", "<leader>sw", function()
-		minisession.write()
-	end, "Write current")
-	map("n", "<leader>sd", function()
-		minisession.select("delete")
-	end, "Delete")
+	map("n", "<leader>ws", function() minisession.write(vim.fn.input("Session name: ")) end, "Save")
+	map("n", "<leader>wr", function() minisession.select("read") end, "Read")
+	map("n", "<leader>ww", function() minisession.write() end, "Write current")
+	map("n", "<leader>wd", function() minisession.select("delete") end, "Delete")
 end
 
 M.snacks = function()
-	local snacks = require("snacks")
-	map({ "n" }, "<leader>o", function()
-		snacks.scratch()
-	end, "Scratch pad")
-	map({ "n" }, "<leader>F", function()
-		snacks.picker.pick("files")
-	end, "Files in directory")
-	map({ "n" }, "<leader>R", function()
-		snacks.picker.pick("recent")
-	end, "Recent files")
-	map({ "n", "t" }, "<A-t>", function()
-		snacks.terminal()
-	end, "Toggle terminal buffer")
+	local Snacks = require("snacks")
+	-- Explorer
+	map("n", "<leader>e", function() Snacks.explorer() end, "File Explorer")
+
+	-- find
+	map("n", "<leader>fb", function() Snacks.picker.buffers() end, "Buffers")
+	map("n", "<leader>ff", function() Snacks.picker.files() end, "Files")
+	map("n", "<leader>fg", function() Snacks.picker.git_files() end, "Git Files")
+	map("n", "<leader>fr", function() Snacks.picker.recent() end, "Recent")
+	map("n", "<leader>fs", function() Snacks.picker.smart() end, "Smart Files")
+	map("n", "<leader>fp", function() Snacks.picker.projects() end, "Projects")
+
+	-- git
+	map("n", "<leader>gb", function() Snacks.picker.git_branches() end, "Git Branches")
+	map("n", "<leader>gl", function() Snacks.picker.git_log() end, "Git Log")
+	map("n", "<leader>gL", function() Snacks.picker.git_log_line() end, "Git Log Line")
+	map("n", "<leader>gs", function() Snacks.picker.git_status() end, "Git Status")
+	map("n", "<leader>gS", function() Snacks.picker.git_stash() end, "Git Stash")
+	map("n", "<leader>gd", function() Snacks.picker.git_diff() end, "Git Diff (Hunks)")
+	map("n", "<leader>gf", function() Snacks.picker.git_log_file() end, "Git Log File")
+	map({ "n", "t" }, "<leader>gg", function() Snacks.lazygit() end, "Lazygit")
+
+	-- Grep
+	map("n", "<leader>sb", function() Snacks.picker.grep_buffers() end, "Grep Open Buffers")
+	map("n", "<leader>sg", function() Snacks.picker.grep() end, "Grep")
+	map({"n", "x"}, "<leader>sw", function() Snacks.picker.grep_word() end, "Visual selection or word")
+
+	-- search
+	map("n", "<leader>s/", function() Snacks.picker.registers() end, "Registers")
+	map("n", "<leader>sm", function() Snacks.picker.marks() end, "Marks")
+	map("n", "<leader>sd", function() Snacks.picker.diagnostics() end, "Diagnostics")
+	map("n", "<leader>sc", function() Snacks.picker.command_history() end, "Command History")
+	map("n", "<leader>q", function() Snacks.picker.qflist() end, "Quickfix List")
+	map("n", "<leader>sr", function() Snacks.picker.resume() end, "Resume search")
+
+	-- misc
+	map({ "n", "t" }, "<leader>p", function() Snacks.scratch() end, "Scratch pad")
+	map({ "n", "t" }, "<A-t>", function() Snacks.terminal() end, "Toggle terminal buffer")
+	map("n", "<leader>oc", function() Snacks.picker.colorschemes() end, "Colorschemes")
+	map("n", "<leader>os", function() Snacks.toggle.option("spell", { name = "Spelling" }) end, "Spelling")
+	map("n", "<leader>ow", function() Snacks.toggle.option("wrap", { name = "Wrap" }) end, "Wrap")
+	map("n", "<leader>on", function() Snacks.toggle.option("relativenumber", { name = "Relative Number" }) end, "Relative Number")
+	map("n", "<leader>od", function() Snacks.toggle.diagnostics() end, "Diagnostics")
+	map("n", "<leader>ol", function() Snacks.toggle.line_number() end, "Line Number")
+	map("n", "<leader>oe", function() Snacks.toggle.option("conceallevel", { off = 0, on = vim.o.conceallevel > 0 and vim.o.conceallevel or 2 }) end, "Conceal Level")
+	map("n", "<leader>oh", function() Snacks.toggle.inlay_hints() end, "Inlay Hints")
+	map("n", "<leader>oi", function() Snacks.toggle.indent() end, "Indent")
+	map("n", "<leader>oD", function() Snacks.toggle.dm() end, "Dim")
+	map("n", "<leader>on", function() Snacks.notifier.hide() end, "Dismiss All Notifications")
+	map("n", "<leader>oz", function() Snacks.zen() end, "Toggle Zen Mode")
 end
 
 M.lsp = function()
-	local miniextra = require("mini.extra")
+	local Snacks = require("snacks")
 
-	-- Jump to the definition of the word under your cursor.
-	--  This is where a variable was first declared, or where a function is defined, etc.
-	--  To jump back, press <C-t>.
-	map("n", "gd", function()
-		miniextra.pickers.lsp({ scope = "definition" })
-	end, "Source definition")
-
-	-- Find references for the word under your cursor.
-	map("n", "gr", function()
-		miniextra.pickers.lsp({ scope = "references" })
-	end, "Source references")
-
-	-- Jump to the implementation of the word under your cursor.
-	--  Useful when your language has ways of declaring types without an actual implementation.
-	map("n", "gi", function()
-		miniextra.pickers.lsp({ scope = "implementation" })
-	end, "Source implementation")
-
-	-- Jump to the type of the word under your cursor.
-	--  Useful when you're not sure what type a variable is and you want to see
-	--  the definition of its *type*, not where it was *defined*.
-	map("n", "gt", function()
-		miniextra.pickers.lsp({ scope = "type_definition" })
-	end, "Source type definition")
-
-	-- Fuzzy find all the symbols in your current document.
-	--  Symbols are things like variables, functions, types, etc.
-	map("n", "<leader>ls", function()
-		miniextra.pickers.lsp({ scope = "document_symbol" })
-	end, "Buffer symbols")
-
-	-- Fuzzy find all the symbols in your current workspace.
-	--  Similar to document symbols, except searches over your entire project.
-	map("n", "<leader>lw", function()
-		miniextra.pickers.lsp({ scope = "workspace_symbol" })
-	end, "Workspace symbols")
-
-	-- Rename the variable under your cursor.
-	--  Most Language Servers support renaming across files, etc.
-	map("n", "<leader>lr", function()
-		vim.lsp.buf.rename()
-	end, "Rename across files")
-
-	-- Execute a code action, usually your cursor needs to be on top of an error
-	-- or a suggestion from your LSP for this to activate.
-	map("n", "<leader>la", function()
-		vim.lsp.buf.code_action()
-	end, "Code actions")
-
-	-- Format current buffer
-	map("n", "<leader>lf", function()
-		require("conform").format({ lsp_fallback = true })
-	end, "Format document")
+	map("n", "ld", function() Snacks.picker.lsp_definitions() end, "Goto Definition")
+	map("n", "lD", function() Snacks.picker.lsp_declarations() end, "Goto Declaration")
+	map("n", "lr", function() Snacks.picker.lsp_references() end, "References")
+	map("n", "li", function() Snacks.picker.lsp_implementations() end, "Goto Implementation")
+	map("n", "lt", function() Snacks.picker.lsp_type_definitions() end, "Goto T[y]pe Definition")
+	map("n", "<leader>ls", function() Snacks.picker.lsp_symbols() end, "LSP Symbols")
+	map("n", "<leader>lw", function() Snacks.picker.lsp_workspace_symbols() end, "LSP Workspace Symbols")
+	map("n", "<leader>lr", function() vim.lsp.buf.rename() end, "Rename across files")
+	map("n", "<leader>la", function() vim.lsp.buf.code_action() end, "Code actions")
+	map("n", "<leader>lf", function() require("conform").format({ lsp_fallback = true }) end, "Format document")
 end
 
 return M

@@ -13,30 +13,15 @@ return {
       return package.loaded["nvim-web-devicons"]
     end
   end,
-  event = function()
-    if vim.fn.argc() == 0 then
-      return "VimEnter"
-    else
-      return { "InsertEnter", "LspAttach" }
-    end
-  end,
   config = function()
     local mini_config = require("config.mini")
     local mini_modules = {
       "icons",
-      "pick",
-      "extra",
       "visits",
-      "files",
-      "bufremove",
       "move",
-      "indentscope",
-      "comment",
-      "pairs",
-      "diff",
       "clue",
-      "notify",
       "surround",
+      "extra"
     }
     for _, module in ipairs(mini_modules) do
       require("mini." .. module).setup(mini_config[module])

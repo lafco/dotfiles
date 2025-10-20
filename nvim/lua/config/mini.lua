@@ -1,45 +1,5 @@
 local M = {}
 
-M.pairs = {
-  mappings = {
-    ["<"] = { action = "closeopen", pair = "<>", neigh_pattern = "[^\\].", register = { cr = false } },
-  },
-}
-
-M.files = {
-  use_as_default_explorer = true,
-  windows = {
-    max_number = math.huge,
-    preview = false,
-    width_focus = 30,
-    width_nofocus = 30,
-    width_preview = 40,
-  },
-}
-
-M.bufremove = {
-  silent = true,
-}
-
-M.comment = {}
-
-M.pick = {
-  options = {
-    use_cache = true,
-  },
-  window = {
-    config = {
-      width = 80,
-      height = 20,
-    }
-  },
-  mappings = {
-    choose_marked = "<C-CR>"
-  }
-}
-
-M.notify = {}
-
 M.move = {
   mappings = {
     left = "<A-h>",
@@ -52,12 +12,6 @@ M.move = {
     line_up = "<A-k>",
   },
 }
-
-M.indentscope = {
-  symbol = "┋",
-}
-
--- M.ai = {}
 
 M.visits = {
   store = {
@@ -90,10 +44,12 @@ M.clue = {
   },
   clues = {
     { mode = 'n', keys = '<Leader>f', desc = '+Find' },
-    { mode = 'n', keys = '<Leader>b', desc = '+Buffer' },
     { mode = 'n', keys = '<Leader>g', desc = '+Git' },
     { mode = 'n', keys = '<Leader>l', desc = '+Language' },
-    { mode = 'n', keys = '<Leader>s', desc = '+Session' },
+    { mode = 'n', keys = '<Leader>w', desc = '+Workspaces' },
+    { mode = 'n', keys = '<Leader>o', desc = '+Options' },
+    { mode = 'n', keys = '<Leader>s', desc = '+Search' },
+    { mode = 'x', keys = '<Leader>s', desc = '+Search' },
     { mode = 'x', keys = '<Leader>g', desc = '+Git' },
     { mode = 'x', keys = '<Leader>l', desc = '+Language' },
     miniclue.gen_clues.builtin_completion(),
@@ -102,15 +58,6 @@ M.clue = {
     miniclue.gen_clues.registers(),
     miniclue.gen_clues.windows(),
     miniclue.gen_clues.z(),
-  },
-}
-
-M.jump = {}
-
-M.diff = {
-  view = {
-    style = "sign",
-    signs = { add = " ", change = " ", delete = "" },
   },
 }
 
@@ -132,5 +79,7 @@ M.icons = {
     ["function"] = { glyph = "󰡱", hl = "MiniIconsCyan" },
   },
 }
+
+M.extra = {}
 
 return M

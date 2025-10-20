@@ -4,27 +4,26 @@ return {
   keys = function()
     require("config.keymaps").snacks()
   end,
-  event = { "BufReadPost" },
   opts = {
-    statuscolumn = {
-      left = { "fold", "git" },
-      right = { "mark", "sign" },
-    },
-    words = {
-      enabled = true,
-      debounce = 500,
-    },
+    bigfile = { enabled = true },
+    explorer = { enabled = true },
+    indent = { enabled = true },
+    input = { enabled = true },
     notifier = {
-      wo = {
-        winblend = vim.g.winblend,
-      },
+      enabled = true,
+      timeout = 2000,
     },
-    indent = {
-      scope = {
-        treesitter = {
-          enabled = true,
-        },
-      },
+    picker = {
+      enabled = true
     },
+    quickfile = { enabled = true },
+    scope = { enabled = true },
+    statuscolumn = { enabled = true },
+    words = { enabled = true },
+    styles = {
+      notification = {
+        -- wo = { wrap = true } -- Wrap notifications
+      }
+    }
   },
 }
