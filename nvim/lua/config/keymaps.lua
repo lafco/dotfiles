@@ -8,6 +8,9 @@ local M = {}
 M.map = map
 
 M.general = function()
+  -- movement
+  map("n", "<S-h>", "<Home>")
+  map("n", "<S-l>", "<End>")
 	-- insert movement
 	map("i", "<C-h>", "<Left>")
 	map("i", "<C-l>", "<Right>")
@@ -111,16 +114,20 @@ M.snacks = function()
 	map("n", "<leader>oD", function() Snacks.toggle.dm() end, "Dim")
 	map("n", "<leader>on", function() Snacks.notifier.hide() end, "Dismiss All Notifications")
 	map("n", "<leader>oz", function() Snacks.zen() end, "Toggle Zen Mode")
+
+  -- editor
+  map({ "n", "t" }, "[[", function() Snacks.words.jump(-vim.v.count1) end, "Prev Reference")
+  map({ "n", "t" }, "]]", function() Snacks.words.jump(vim.v.count1) end, "Next Reference")
 end
 
 M.lsp = function()
 	local Snacks = require("snacks")
 
-	map("n", "ld", function() Snacks.picker.lsp_definitions() end, "Goto Definition")
-	map("n", "lD", function() Snacks.picker.lsp_declarations() end, "Goto Declaration")
-	map("n", "lr", function() Snacks.picker.lsp_references() end, "References")
-	map("n", "li", function() Snacks.picker.lsp_implementations() end, "Goto Implementation")
-	map("n", "lt", function() Snacks.picker.lsp_type_definitions() end, "Goto T[y]pe Definition")
+	map("n", "gd", function() Snacks.picker.lsp_definitions() end, "Goto Definition")
+	map("n", "gD", function() Snacks.picker.lsp_declarations() end, "Goto Declaration")
+	map("n", "gr", function() Snacks.picker.lsp_references() end, "References")
+	map("n", "gi", function() Snacks.picker.lsp_implementations() end, "Goto Implementation")
+	map("n", "gt", function() Snacks.picker.lsp_type_definitions() end, "Goto T[y]pe Definition")
 	map("n", "<leader>ls", function() Snacks.picker.lsp_symbols() end, "LSP Symbols")
 	map("n", "<leader>lw", function() Snacks.picker.lsp_workspace_symbols() end, "LSP Workspace Symbols")
 	map("n", "<leader>lr", function() vim.lsp.buf.rename() end, "Rename across files")
