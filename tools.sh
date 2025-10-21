@@ -179,16 +179,53 @@ install_core_tools() {
     log_success "Core tools installed"
 }
 
+# Install GAH (GitHub Apt Helper)
+install_gah() {
+    if command -v gah &> /dev/null; then
+        log_info "GAH is already installed"
+        return 0
+    fi
+
+    log_info "Installing GAH (GitHub Apt Helper)..."
+
+    # Install GAH
+    if bash -c "$(curl -fsSL https://raw.githubusercontent.com/marverix/gah/refs/heads/master/tools/install.sh)"; then
+        # Ensure ~/.local/bin is in PATH for current session
+        export PATH="$HOME/.local/bin:$PATH"
+        log_success "GAH installed successfully"
+    else
+        log_warning "GAH installation failed, falling back to manual installations"
+        return 1
+    fi
+}
+
 # Install modern shell tools
 install_shell_tools() {
     log_info "Installing modern shell tools..."
-    
+
     case $PKG_MANAGER in
         "apt")
+            # Install GAH for GitHub releases
+            install_gah
+
             # Install from repositories where available
             $INSTALL_CMD ripgrep fd-find bat eza fish
-            # Install zoxide manually
-            curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
+
+            # Install tools via GAH if available
+            if command -v gah &> /dev/null; then
+                log_info "Installing zoxide via GAH..."
+                gah install zoxide --unattended || curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
+
+                log_info "Installing fzf via GAH..."
+                gah install fzf --unattended || (git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf && ~/.fzf/install --all)
+
+                log_info "Installing gh via GAH..."
+                gah install gh --unattended
+            else
+                # Fallback to manual installation
+                curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
+                git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf && ~/.fzf/install --all
+            fi
             ;;
         "dnf")
             $INSTALL_CMD ripgrep fd-find bat eza fish zoxide
@@ -205,25 +242,17 @@ install_shell_tools() {
             $INSTALL_CMD ripgrep fd bat eza fish zoxide fzf gh
             ;;
     esac
-    
+
     # Install fzf if not available through package manager
-    if ! command -v fzf &> /dev/null; then
+    if ! command -v fzf &> /dev/null && [[ "$PKG_MANAGER" != "apt" ]]; then
         log_info "Installing fzf..."
         git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
         ~/.fzf/install --all
     fi
-    
+
     # Install GitHub CLI if not available
-    if ! command -v gh &> /dev/null; then
+    if ! command -v gh &> /dev/null && [[ "$PKG_MANAGER" != "apt" ]]; then
         case $PKG_MANAGER in
-            "apt")
-                curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
-                echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
-                if ! sudo apt update; then
-                    log_warning "Package update had issues, but continuing..."
-                fi
-                sudo apt install gh
-                ;;
             "dnf")
                 sudo dnf install gh
                 ;;
@@ -232,7 +261,7 @@ install_shell_tools() {
                 ;;
         esac
     fi
-    
+
     log_success "Shell tools installed"
 }
 
@@ -404,7 +433,7 @@ install_gui_apps() {
 # Install btop if available
 install_system_tools() {
     log_info "Installing additional system tools..."
-    
+
     case $PKG_MANAGER in
         "apt")
             # btop might not be available in older Ubuntu versions
@@ -421,8 +450,61 @@ install_system_tools() {
             $INSTALL_CMD btop
             ;;
     esac
-    
+
     log_success "System tools installed"
+}
+
+# Install lazygit
+install_lazygit() {
+    log_info "Installing lazygit..."
+
+    case $PKG_MANAGER in
+        "apt")
+            # Check if lazygit is available in official repositories
+            if apt-cache show lazygit &> /dev/null; then
+                $INSTALL_CMD lazygit
+            else
+                # Try installing via GAH first (no sudo required)
+                if command -v gah &> /dev/null; then
+                    log_info "Installing lazygit via GAH..."
+                    if gah install lazygit --unattended; then
+                        log_success "lazygit installed via GAH"
+                        return 0
+                    else
+                        log_warning "GAH installation failed, trying PPA..."
+                    fi
+                fi
+
+                # Fallback to PPA for older Ubuntu versions
+                log_info "Adding lazygit PPA..."
+                sudo add-apt-repository ppa:lazygit-team/release -y
+                if ! sudo apt update; then
+                    log_warning "Package update had issues, but continuing..."
+                fi
+                sudo apt install lazygit -y
+            fi
+            ;;
+        "dnf")
+            log_info "Enabling lazygit Copr repository..."
+            sudo dnf copr enable atim/lazygit -y
+            $INSTALL_CMD lazygit
+            ;;
+        "pacman")
+            # lazygit is available in official Arch repositories
+            $INSTALL_CMD lazygit
+            ;;
+        "zypper")
+            log_info "Adding devel:languages:go repository..."
+            sudo zypper ar https://download.opensuse.org/repositories/devel:/languages:/go/openSUSE_Factory/devel:languages:go.repo
+            sudo zypper ref
+            sudo zypper in -y lazygit
+            ;;
+        "brew")
+            $INSTALL_CMD lazygit
+            ;;
+    esac
+
+    log_success "lazygit installed"
 }
 
 # Install PostgreSQL
@@ -547,18 +629,22 @@ help() {
     echo ""
     echo "Available functions:"
     echo "  core_tools      - Install core development tools (git, curl, etc.)"
+    echo "  gah             - Install GAH (GitHub Apt Helper) for easy GitHub releases installation"
     echo "  shell_tools     - Install modern shell tools (ripgrep, fd, bat, etc.)"
     echo "  runtimes        - Install development runtimes (Node.js, Python, Rust)"
     echo "  fonts           - Install fonts (JetBrains Mono, FiraCode Nerd Fonts)"
     echo "  gui_apps        - Install GUI applications (Neovim, Neovide, Starship)"
     echo "  system_tools    - Install additional system tools (btop)"
+    echo "  lazygit         - Install lazygit terminal UI for git"
     echo "  postgresql      - Install and configure PostgreSQL"
     echo "  configs         - Set up configuration files"
     echo "  fix_ppas        - Fix broken PPAs (Ubuntu only)"
     echo ""
     echo "Examples:"
     echo "  $0                   # Run full installation"
+    echo "  $0 gah               # Install only GAH"
     echo "  $0 gui_apps          # Install only GUI applications"
+    echo "  $0 lazygit           # Install only lazygit"
     echo "  $0 postgresql        # Install only PostgreSQL"
     echo "  $0 fonts             # Install only fonts"
     echo ""
@@ -567,14 +653,17 @@ help() {
 # Run a specific function
 run_function() {
     local func_name="$1"
-    
+
     # Always run system detection first
     detect_system
-    
+
     case "$func_name" in
         "core_tools")
             detect_and_fix_broken_ppas
             install_core_tools
+            ;;
+        "gah")
+            install_gah
             ;;
         "shell_tools")
             install_shell_tools
@@ -591,6 +680,9 @@ run_function() {
         "system_tools")
             install_system_tools
             ;;
+        "lazygit")
+            install_lazygit
+            ;;
         "postgresql")
             install_postgresql
             ;;
@@ -606,14 +698,14 @@ run_function() {
             exit 1
             ;;
     esac
-    
+
     log_success "Function '$func_name' completed!"
 }
 
 # Main installation function
 main() {
     log_info "Starting dotfiles installation..."
-    
+
     detect_system
     detect_and_fix_broken_ppas
     install_core_tools
@@ -622,6 +714,7 @@ main() {
     install_fonts
     install_gui_apps
     install_system_tools
+    install_lazygit
     install_postgresql
     setup_configs
     setup_shell_integrations
@@ -640,33 +733,12 @@ main() {
 
     echo ""
     log_success "Installation complete!"
-    echo ""
-    echo "=== Development Environment Setup ==="
-    echo ""
-    echo "📦 Installed applications:"
-    echo "  - nvim (Neovim with custom config)"
-    echo "  - neovide (GUI Neovim) [if available]"
-    echo "  - fish (Fish shell)"
-    echo "  - starship (Cross-shell prompt)"
-    echo "  - Essential dev tools: git, ripgrep, fd, eza, bat, etc."
-    echo ""
-    echo "🚀 Development runtimes:"
-    echo "  - Node.js (LTS) via mise"
-    echo "  - Python (latest) via mise" 
-    echo "  - Rust (latest stable)"
-    echo ""
-    echo "🗄️  Database:"
-    echo "  - PostgreSQL (with user '$USER' created)"
-    echo "  - Connect with: psql"
-    echo ""
-    echo "📚 Next steps:"
-    echo "  - Restart your terminal or run: source ~/.bashrc"
     echo "  - To set Fish as default shell: chsh -s \$(which fish)"
     echo "  - Run 'mise install' to ensure runtimes are available"
-    echo "  - Start Neovim with 'nvim' or GUI with 'neovide'"
     echo "  - Connect to PostgreSQL with 'psql'"
+    echo "  - Use 'lazygit' for an interactive git UI"
     echo ""
-    echo "🔧 Configuration files are linked to ~/.config/"
+    echo "   Configuration files are linked to ~/.config/"
     echo "   Edit files in $(pwd) to modify configurations"
 }
 
