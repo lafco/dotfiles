@@ -2,35 +2,34 @@
 
 #### One-Line Installation
 ```bash
-curl -fsSL https://raw.githubusercontent.com/lafco/dotfiles/main/install-remote.sh | bash
+curl -fsSL https://raw.githubusercontent.com/lafco/dotfiles/main/install.sh | bash
 ```
 
 #### Manual Installation
 ```bash
 git clone https://github.com/lafco/dotfiles.git
 cd dotfiles
-./install.sh
+./tools.sh
 ```
 ### Development Tools
-- **Ghostty**: Modern GPU-accelerated terminal emulator with native speed
-- **Fish Shell**: Smart shell with autosuggestions and modern syntax
-- **Starship**: Fast, minimal prompt with git integration
-- **Neovide**: Beautiful GUI frontend for Neovim
-- **mise**: Universal version manager for Node.js, Python, Rust, and more
-- **GitHub CLI (gh)**: Complete GitHub workflow from the command line
-- **PostgreSQL**: Production-ready database with user account setup
-- **LSP Support**: lua-language-server, nixd, and more via Mason
+- **Ghostty**:
+- **Fish Shell**:
+- **Neovide**:
+- **mise**:
+- **GitHub CLI (gh)**:
+- **lazygit**:
+- **PostgreSQL**:
 
 ### Shell Utilities
-- **eza**: Modern `ls` replacement with icons and git status
-- **zoxide**: Smart `cd` that learns your navigation patterns
+- **eza**: `ls` replacement with icons and git status
+- **zoxide**: `cd` that learns your navigation patterns
 - **fzf**: Fuzzy finder for files, history, and commands
 - **bat**: Syntax-highlighted `cat` with git integration
 - **ripgrep**: Ultra-fast text search
 - **fd**: Simple, fast alternative to `find`
+- **gah**: github repo installer
 
-### Aliases
-Fish shell comes pre-configured with productivity-boosting aliases:
+### Fish Aliases
 
 ```bash
 # Navigation
@@ -54,12 +53,10 @@ ghs          # Repo status
 - `Ctrl+R`: Fuzzy search command history
 - `Ctrl+T`: Fuzzy find files
 - `Alt+C`: Fuzzy find and cd to directory
-
 ## Setting Fish as Default Shell
 ```bash
 chsh -s $(which fish)
 ```
-
 ### Managing Runtime Versions
 Edit `.mise.toml` to change global versions, or create per-project `.mise.toml`:
 
