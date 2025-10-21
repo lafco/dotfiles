@@ -18,14 +18,13 @@ return {
     })
     require("mini.surround").setup({
       mappings = {
-        add = 'ra',        -- Add surrounding in Normal and Visual modes
-        delete = 'rd',     -- Delete surrounding
-        find = 'rf',       -- Find surrounding (to the right)
-        find_left = 'rF',  -- Find surrounding (to the left)
-        highlight = 'rh',  -- Highlight surrounding
-        replace = 'rr',    -- Replace surrounding
-        suffix_last = 'p', -- Suffix to search with "prev" method
-        suffix_next = 'n', -- Suffix to search with "next" method
+        add = "gsa", -- Add surrounding in Normal and Visual modes
+        delete = "gsd", -- Delete surrounding
+        find = "gsf", -- Find surrounding (to the right)
+        find_left = "gsF", -- Find surrounding (to the left)
+        highlight = "gsh", -- Highlight surrounding
+        replace = "gsr", -- Replace surrounding
+        update_n_lines = "gsn", -- Update `n_lines`
       }
     })
   end,

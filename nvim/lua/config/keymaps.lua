@@ -28,9 +28,6 @@ M.general = function()
 	map("t", "<C-j>", "<C-\\><C-N><C-w>j")
 	map("t", "<C-k>", "<C-\\><C-N><C-w>k")
 	map("t", "<C-l>", "<C-\\><C-N><C-w>l")
-	-- Buffer navigation
-	map("n", "<Tab>", "<cmd>bnext<CR>")
-	map("n", "<s-Tab>", "<cmd>bprev<CR>")
 	-- Resize splits
 	map("n", "<A-up>", ":resize +2<CR>")
 	map("n", "<A-down>", ":resize -2<CR>")
@@ -69,21 +66,20 @@ M.snacks = function()
 	map("n", "<leader>gf", function() Snacks.picker.git_log_file() end, "Git Log File")
 	map({ "n", "t" }, "<leader>gg", function() Snacks.lazygit() end, "Lazygit")
 
-	-- Grep
+	-- Grep/search
 	map("n", "<leader>sb", function() Snacks.picker.grep_buffers() end, "Grep Open Buffers")
 	map("n", "<leader>ss", function() Snacks.picker.grep() end, "Grep")
-	map({"n", "x"}, "<leader>sw", function() Snacks.picker.grep_word() end, "Visual selection or word")
-
-	-- search
 	map("n", "<leader>s/", function() Snacks.picker.registers() end, "Registers")
 	map("n", "<leader>sm", function() Snacks.picker.marks() end, "Marks")
 	map("n", "<leader>sd", function() Snacks.picker.diagnostics() end, "Diagnostics")
 	map("n", "<leader>sc", function() Snacks.picker.command_history() end, "Command History")
 	map("n", "<leader>q", function() Snacks.picker.qflist() end, "Quickfix List")
 	map("n", "<leader>sr", function() Snacks.picker.resume() end, "Resume search")
+	map("n", "<leader>sn", function() Snacks.picker.notifications() end, "Notifications")
+	map({"n", "x"}, "<leader>sw", function() Snacks.picker.grep_word() end, "Visual selection or word")
 
 	-- misc
-	map({ "n", "t" }, "<leader>p", function() Snacks.scratch() end, "Scratch pad")
+	map({ "n", "t" }, "<leader>op", function() Snacks.scratch() end, "Scratch pad")
 	map({ "n", "t" }, "<A-t>", function() Snacks.terminal() end, "Toggle terminal buffer")
 	map("n", "<leader>oc", function() Snacks.picker.colorschemes() end, "Colorschemes")
 	map("n", "<leader>os", function() Snacks.toggle.option("spell", { name = "Spelling" }) end, "Spelling")
@@ -109,6 +105,22 @@ M.snacks = function()
   map({ "n", "t" }, "]]", function() Words.jump(vim.v.count1) end, "Next Reference")
 end
 
+M.yank = function()
+	local Snacks = require("snacks")
+
+	map("n", "<leader>p", function() Snacks.picker.yanky() end, "Open Yank History")
+	map({"n", "x"}, "y", "<Plug>(YankyYank)","Yank Text")
+	map({"n", "x"}, "p", "<Plug>(YankyPutAfter)","Put after cursor")
+	map({"n", "x"}, "P", "<Plug>(YankyPutBefore)","Put before cursor")
+	map({"n", "x"}, "gp", "<Plug>(YankyGPutAfter)","Put after selection")
+	map({"n", "x"}, "gP", "<Plug>(YankyGPutBefore)","Put before selection")
+	map("n", "]p", "<Plug>(YankyPutIndentAfterLinewise)","Put indented after cursor")
+	map("n", "[p", "<Plug>(YankyPutIndentBeforeLinewise)","Put indented before cursor")
+	map("n", "[p", "<Plug>(YankyPutIndentBeforeLinewise)","Put indented before cursor")
+	map("n", ">p", "<Plug>(YankyPutIndentBeforeShiftRight)","Put before and indent right")
+	map("n", "<p", "<Plug>(YankyPutIndentBeforeShiftLeft)","Put before and indent left")
+end
+
 M.lsp = function()
 	local Snacks = require("snacks")
 
@@ -121,7 +133,7 @@ M.lsp = function()
 	map("n", "<leader>lw", function() Snacks.picker.lsp_workspace_symbols() end, "LSP Workspace Symbols")
 	map("n", "<leader>lr", function() vim.lsp.buf.rename() end, "Rename across files")
 	map("n", "<leader>la", function() vim.lsp.buf.code_action() end, "Code actions")
-	map("n", "<leader>lf", function() require("conform").format({ lsp_fallback = true }) end, "Format document")
+	-- map("n", "<leader>lf", function() require("conform").format({ lsp_fallback = true }) end, "Format document")
 end
 
 return M
