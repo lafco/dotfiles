@@ -46,23 +46,6 @@ M.general = function()
 	map("n", "<A-p>", "<cmd>cprev<CR>")
 end
 
-M.mini = function()
-	local miniextra = require("mini.extra")
-	local minivisits = require("mini.visits")
-	local minisession = require("mini.sessions")
-
-	-- Visits
-	map("n", "<A-z>", function() miniextra.pickers.visit_paths({ filter = "marked" }) end, "Open visits")
-	map("n", "<A-a>", function() minivisits.add_label("marked") end, "Add file to visits")
-	map("n", "<A-r>", function() minivisits.remove_label("marked") end, "Remove file from visits")
-
-	-- Session management
-	map("n", "<leader>ws", function() minisession.write(vim.fn.input("Session name: ")) end, "Save")
-	map("n", "<leader>wr", function() minisession.select("read") end, "Read")
-	map("n", "<leader>ww", function() minisession.write() end, "Write current")
-	map("n", "<leader>wd", function() minisession.select("delete") end, "Delete")
-end
-
 M.snacks = function()
 	local Snacks = require("snacks")
 	-- Explorer
@@ -88,7 +71,7 @@ M.snacks = function()
 
 	-- Grep
 	map("n", "<leader>sb", function() Snacks.picker.grep_buffers() end, "Grep Open Buffers")
-	map("n", "<leader>sg", function() Snacks.picker.grep() end, "Grep")
+	map("n", "<leader>ss", function() Snacks.picker.grep() end, "Grep")
 	map({"n", "x"}, "<leader>sw", function() Snacks.picker.grep_word() end, "Visual selection or word")
 
 	-- search
@@ -106,18 +89,24 @@ M.snacks = function()
 	map("n", "<leader>os", function() Snacks.toggle.option("spell", { name = "Spelling" }) end, "Spelling")
 	map("n", "<leader>ow", function() Snacks.toggle.option("wrap", { name = "Wrap" }) end, "Wrap")
 	map("n", "<leader>on", function() Snacks.toggle.option("relativenumber", { name = "Relative Number" }) end, "Relative Number")
-	map("n", "<leader>od", function() Snacks.toggle.diagnostics() end, "Diagnostics")
 	map("n", "<leader>ol", function() Snacks.toggle.line_number() end, "Line Number")
-	map("n", "<leader>oe", function() Snacks.toggle.option("conceallevel", { off = 0, on = vim.o.conceallevel > 0 and vim.o.conceallevel or 2 }) end, "Conceal Level")
 	map("n", "<leader>oh", function() Snacks.toggle.inlay_hints() end, "Inlay Hints")
 	map("n", "<leader>oi", function() Snacks.toggle.indent() end, "Indent")
-	map("n", "<leader>oD", function() Snacks.toggle.dm() end, "Dim")
+	map("n", "<leader>od", function() Snacks.toggle.dim() end, "Dim")
 	map("n", "<leader>on", function() Snacks.notifier.hide() end, "Dismiss All Notifications")
 	map("n", "<leader>oz", function() Snacks.zen() end, "Toggle Zen Mode")
 
+	-- sessions
+	local Persistence = require("persistence")
+	map("n", "<leader>ws", function() Persistence.load() end, "Load directory")
+	map("n", "<leader>wS", function() Persistence.select() end, "Select session")
+	map("n", "<leader>wl", function() Persistence.load({ last = true }) end, "Load last session")
+	map("n", "<leader>wd", function() Persistence.stop() end, "Stop session save")
+
   -- editor
-  map({ "n", "t" }, "[[", function() Snacks.words.jump(-vim.v.count1) end, "Prev Reference")
-  map({ "n", "t" }, "]]", function() Snacks.words.jump(vim.v.count1) end, "Next Reference")
+	local Words = Snacks.words
+  map({ "n", "t" }, "[[", function() Words.jump(-vim.v.count1) end, "Prev Reference")
+  map({ "n", "t" }, "]]", function() Words.jump(vim.v.count1) end, "Next Reference")
 end
 
 M.lsp = function()
@@ -127,7 +116,7 @@ M.lsp = function()
 	map("n", "gD", function() Snacks.picker.lsp_declarations() end, "Goto Declaration")
 	map("n", "gr", function() Snacks.picker.lsp_references() end, "References")
 	map("n", "gi", function() Snacks.picker.lsp_implementations() end, "Goto Implementation")
-	map("n", "gt", function() Snacks.picker.lsp_type_definitions() end, "Goto T[y]pe Definition")
+	map("n", "gt", function() Snacks.picker.lsp_type_definitions() end, "Goto Type Definition")
 	map("n", "<leader>ls", function() Snacks.picker.lsp_symbols() end, "LSP Symbols")
 	map("n", "<leader>lw", function() Snacks.picker.lsp_workspace_symbols() end, "LSP Workspace Symbols")
 	map("n", "<leader>lr", function() vim.lsp.buf.rename() end, "Rename across files")

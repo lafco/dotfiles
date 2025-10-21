@@ -1,30 +1,32 @@
 -- lua/custom/plugins/mini.lua
 return {
-  "echasnovski/mini.nvim",
+  "nvim-mini/mini.nvim",
   name = "mini",
   version = false,
-  keys = function()
-    require("config.keymaps").mini()
-  end,
-  init = function()
-    package.preload["nvim-web-devicons"] = function()
-      package.loaded["nvim-web-devicons"] = {}
-      require("mini.icons").mock_nvim_web_devicons()
-      return package.loaded["nvim-web-devicons"]
-    end
-  end,
   config = function()
-    local mini_config = require("config.mini")
-    local mini_modules = {
-      "icons",
-      "visits",
-      "move",
-      "clue",
-      "surround",
-      "extra"
-    }
-    for _, module in ipairs(mini_modules) do
-      require("mini." .. module).setup(mini_config[module])
-    end
+    require("mini.move").setup({
+      mappings = {
+        left = "<A-h>",
+        right = "<A-l>",
+        down = "<A-j>",
+        up = "<A-k>",
+        line_left = "<A-h>",
+        line_right = "<A-l>",
+        line_down = "<A-j>",
+        line_up = "<A-k>",
+      },
+    })
+    require("mini.surround").setup({
+      mappings = {
+        add = 'ra',        -- Add surrounding in Normal and Visual modes
+        delete = 'rd',     -- Delete surrounding
+        find = 'rf',       -- Find surrounding (to the right)
+        find_left = 'rF',  -- Find surrounding (to the left)
+        highlight = 'rh',  -- Highlight surrounding
+        replace = 'rr',    -- Replace surrounding
+        suffix_last = 'p', -- Suffix to search with "prev" method
+        suffix_next = 'n', -- Suffix to search with "next" method
+      }
+    })
   end,
 }

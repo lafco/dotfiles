@@ -1,8 +1,5 @@
 local conf_path = vim.fn.stdpath "config" --[[@as string]]
 return {
-  { -- This helps with php/html for indentation
-    'captbaritone/better-indent-support-for-php-with-html',
-  },
   {
     'Bekaboo/dropbar.nvim',
   },
@@ -11,6 +8,13 @@ return {
     config = function()
       require('nvim-highlight-colors').setup({})
     end
+  },
+  {
+    "folke/persistence.nvim",
+    event = "BufReadPre", -- this will only start session saving when an actual file was opened
+    opts = {
+      -- add any custom options here
+    }
   },
   {
     name = "options",
