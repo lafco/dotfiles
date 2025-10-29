@@ -1,27 +1,70 @@
 return {
-  "folke/snacks.nvim",
-  name = "snacks",
-  keys = function()
-    require("config.keymaps").snacks()
-  end,
+  "snacks.nvim",
   opts = {
-    bigfile = { enabled = true },
-    explorer = { enabled = true },
-    indent = { enabled = true },
-    input = { enabled = true },
-    notifier = {
-      enabled = true,
-      timeout = 2000,
+    scroll = { enabled = false },
+    dashboard = {
+      preset = {
+        pick = function(cmd, opts)
+          return LazyVim.pick(cmd, opts)()
+        end,
+        -- stylua: ignore
+        ---@type snacks.dashboard.Item[]
+        header = "",
+        keys = {
+          { icon = " ", key = "f", desc = "Find File", action = ":lua Snacks.dashboard.pick('files')" },
+          { icon = " ", key = "n", desc = "New File", action = ":ene | startinsert" },
+          { icon = " ", key = "g", desc = "Find Text", action = ":lua Snacks.dashboard.pick('live_grep')" },
+          { icon = " ", key = "r", desc = "Recent Files", action = ":lua Snacks.dashboard.pick('oldfiles')" },
+          {
+            icon = " ",
+            key = "c",
+            desc = "Config",
+            action = ":lua Snacks.dashboard.pick('files', {cwd = vim.fn.stdpath('config')})",
+          },
+          { icon = " ", key = "s", desc = "Restore Session", section = "session" },
+          { icon = " ", key = "x", desc = "Lazy Extras", action = ":LazyExtras" },
+          { icon = "󰒲 ", key = "l", desc = "Lazy", action = ":Lazy" },
+          { icon = " ", key = "q", desc = "Quit", action = ":qa" },
+        },
+      },
     },
-    picker = {
-      enabled = true
+  },
+  keys = {
+    {
+      "<leader>uN",
+      function()
+        Snacks.picker.notifications()
+      end,
+      desc = "Notification History",
     },
-    quickfile = { enabled = true },
-    scope = { enabled = true },
-    statuscolumn = { enabled = true },
-    words = { enabled = true },
-    styles = {
-      notification = {}
-    }
+    {
+      "<leader>fs",
+      function()
+        Snacks.scratch()
+      end,
+      desc = "Toggle Scratch Buffer",
+    },
+    { "<leader>n", false },
+    { "<leader>S", false },
+    { "<leader>dps", false },
+    { "<leader>,", false },
+    { "<leader>e", false },
+    { "<leader>E", false },
+    { "<leader>sa", false },
+    { "<leader>sb", false },
+    { "<leader>sC", false },
+    { "<leader>sh", false },
+    { "<leader>sH", false },
+    { "<leader>sM", false },
+    { "<leader>sl", false },
+    { "<leader>st", false },
+    { "<leader>sp", false },
+    { "<leader>sk", false },
+    { '<leader>s"', false },
+    { "<leader>sW", false },
+    { "<leader>sG", false },
+    { "<leader>si", false },
+    { "<leader>st", false },
+    { "<leader>.", false },
   },
 }

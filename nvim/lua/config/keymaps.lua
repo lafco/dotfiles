@@ -1,139 +1,37 @@
-local function map(mode, keys, action, desc)
-	desc = desc or ""
-	local opts = { noremap = true, silent = true, desc = desc }
-	vim.keymap.set(mode, keys, action, opts)
-end
+-- Keymaps are automatically loaded on the VeryLazy event
+-- Default keymaps that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymaps.lua
 
-local M = {}
-M.map = map
+-- Add additional keymaps
+vim.keymap.set("n", "<leader>w-", "<C-W>s", { desc = "Split Window Below", remap = true })
+vim.keymap.set("n", "<leader>w|", "<C-W>v", { desc = "Split Window Right", remap = true })
+vim.keymap.set("n", "<leader>qd", '<Cmd>lua MiniSessions.select("delete")<CR>', { desc = "Delete" })
+vim.keymap.set("n", "<leader>qn", '<Cmd>lua MiniSessions.write(vim.fn.input("Session name: "))<CR>', { desc = "New" })
+vim.keymap.set("n", "<leader>qr", '<Cmd>lua MiniSessions.select("read")<CR>', { desc = "Read" })
+vim.keymap.set("n", "<leader>qw", "<Cmd>lua MiniSessions.write()<CR>", { desc = "Write current" })
+vim.keymap.set("i", "<C-h>", "<Left>")
+vim.keymap.set("i", "<C-l>", "<Right>")
+vim.keymap.set("i", "<C-BS>", "<C-w>")
+vim.keymap.set("i", "<S-BS>", "<C-w>")
+vim.keymap.set("n", "<S-h>", "12<Left>")
+vim.keymap.set("n", "<S-l>", "12<Right>")
 
-M.general = function()
-  -- movement
-  map("n", "<S-h>", "<Home>")
-  map("n", "<S-l>", "<End>")
-	-- insert movement
-	map("i", "<C-h>", "<Left>")
-	map("i", "<C-l>", "<Right>")
-	map("i", "<C-c>", "<esc>")
-	map("i", "<C-q>", "<esc>")
-	map("n", "<C-c>", "<cmd>noh<CR>")
-	map("n", "<C-s>", "<cmd>update<CR>")
-	-- Switching splits
-	map("n", "<C-h>", "<C-w>h")
-	map("n", "<C-j>", "<C-w>j")
-	map("n", "<C-k>", "<C-w>k")
-	map("n", "<C-l>", "<C-w>l")
-	-- Switching splits (terminal)
-	map("t", "<C-h>", "<C-\\><C-N><C-w>h")
-	map("t", "<C-j>", "<C-\\><C-N><C-w>j")
-	map("t", "<C-k>", "<C-\\><C-N><C-w>k")
-	map("t", "<C-l>", "<C-\\><C-N><C-w>l")
-	-- Resize splits
-	map("n", "<A-up>", ":resize +2<CR>")
-	map("n", "<A-down>", ":resize -2<CR>")
-	map("n", "<A-left>", ":vertical resize +2<CR>")
-	map("n", "<A-right>", ":vertical resize -2<CR>")
-	-- Resize splits (terminal)
-	map("t", "<A-up>", "<C-\\><C-N>:resize +2<CR>")
-	map("t", "<A-down>", "<C-\\><C-N>:resize -2<CR>")
-	map("t", "<A-left>", "<C-\\><C-N>:vertical resize +2<CR>")
-	map("t", "<A-right>", "<C-\\><C-N>:vertical resize -2<CR>")
-	-- Quickfix list
-	map("n", "<A-n>", "<cmd>cnext<CR>")
-	map("n", "<A-p>", "<cmd>cprev<CR>")
-end
-
-M.snacks = function()
-	local Snacks = require("snacks")
-	-- Explorer
-	map("n", "<leader>e", function() Snacks.explorer() end, "File Explorer")
-
-	-- find
-	map("n", "<leader>fb", function() Snacks.picker.buffers() end, "Buffers")
-	map("n", "<leader>ff", function() Snacks.picker.files() end, "Files")
-	map("n", "<leader>fg", function() Snacks.picker.git_files() end, "Git Files")
-	map("n", "<leader>fr", function() Snacks.picker.recent() end, "Recent")
-	map("n", "<leader>fs", function() Snacks.picker.smart() end, "Smart Files")
-	map("n", "<leader>fp", function() Snacks.picker.projects() end, "Projects")
-
-	-- git
-	map("n", "<leader>gb", function() Snacks.picker.git_branches() end, "Git Branches")
-	map("n", "<leader>gl", function() Snacks.picker.git_log() end, "Git Log")
-	map("n", "<leader>gL", function() Snacks.picker.git_log_line() end, "Git Log Line")
-	map("n", "<leader>gs", function() Snacks.picker.git_status() end, "Git Status")
-	map("n", "<leader>gS", function() Snacks.picker.git_stash() end, "Git Stash")
-	map("n", "<leader>gd", function() Snacks.picker.git_diff() end, "Git Diff (Hunks)")
-	map("n", "<leader>gf", function() Snacks.picker.git_log_file() end, "Git Log File")
-	map({ "n", "t" }, "<leader>gg", function() Snacks.lazygit() end, "Lazygit")
-
-	-- Grep/search
-	map("n", "<leader>sb", function() Snacks.picker.grep_buffers() end, "Grep Open Buffers")
-	map("n", "<leader>ss", function() Snacks.picker.grep() end, "Grep")
-	map("n", "<leader>s/", function() Snacks.picker.registers() end, "Registers")
-	map("n", "<leader>sm", function() Snacks.picker.marks() end, "Marks")
-	map("n", "<leader>sd", function() Snacks.picker.diagnostics() end, "Diagnostics")
-	map("n", "<leader>sc", function() Snacks.picker.command_history() end, "Command History")
-	map("n", "<leader>q", function() Snacks.picker.qflist() end, "Quickfix List")
-	map("n", "<leader>sr", function() Snacks.picker.resume() end, "Resume search")
-	map("n", "<leader>sn", function() Snacks.picker.notifications() end, "Notifications")
-	map({"n", "x"}, "<leader>sw", function() Snacks.picker.grep_word() end, "Visual selection or word")
-
-	-- misc
-	map({ "n", "t" }, "<leader>op", function() Snacks.scratch() end, "Scratch pad")
-	map({ "n", "t" }, "<A-t>", function() Snacks.terminal() end, "Toggle terminal buffer")
-	map("n", "<leader>oc", function() Snacks.picker.colorschemes() end, "Colorschemes")
-	map("n", "<leader>os", function() Snacks.toggle.option("spell", { name = "Spelling" }) end, "Spelling")
-	map("n", "<leader>ow", function() Snacks.toggle.option("wrap", { name = "Wrap" }) end, "Wrap")
-	map("n", "<leader>on", function() Snacks.toggle.option("relativenumber", { name = "Relative Number" }) end, "Relative Number")
-	map("n", "<leader>ol", function() Snacks.toggle.line_number() end, "Line Number")
-	map("n", "<leader>oh", function() Snacks.toggle.inlay_hints() end, "Inlay Hints")
-	map("n", "<leader>oi", function() Snacks.toggle.indent() end, "Indent")
-	map("n", "<leader>od", function() Snacks.toggle.dim() end, "Dim")
-	map("n", "<leader>on", function() Snacks.notifier.hide() end, "Dismiss All Notifications")
-	map("n", "<leader>oz", function() Snacks.zen() end, "Toggle Zen Mode")
-
-	-- sessions
-	local Persistence = require("persistence")
-	map("n", "<leader>ws", function() Persistence.load() end, "Load directory")
-	map("n", "<leader>wS", function() Persistence.select() end, "Select session")
-	map("n", "<leader>wl", function() Persistence.load({ last = true }) end, "Load last session")
-	map("n", "<leader>wd", function() Persistence.stop() end, "Stop session save")
-
-  -- editor
-	local Words = Snacks.words
-  map({ "n", "t" }, "[[", function() Words.jump(-vim.v.count1) end, "Prev Reference")
-  map({ "n", "t" }, "]]", function() Words.jump(vim.v.count1) end, "Next Reference")
-end
-
-M.yank = function()
-	local Snacks = require("snacks")
-
-	map("n", "<leader>p", function() Snacks.picker.yanky() end, "Open Yank History")
-	map({"n", "x"}, "y", "<Plug>(YankyYank)","Yank Text")
-	map({"n", "x"}, "p", "<Plug>(YankyPutAfter)","Put after cursor")
-	map({"n", "x"}, "P", "<Plug>(YankyPutBefore)","Put before cursor")
-	map({"n", "x"}, "gp", "<Plug>(YankyGPutAfter)","Put after selection")
-	map({"n", "x"}, "gP", "<Plug>(YankyGPutBefore)","Put before selection")
-	map("n", "]p", "<Plug>(YankyPutIndentAfterLinewise)","Put indented after cursor")
-	map("n", "[p", "<Plug>(YankyPutIndentBeforeLinewise)","Put indented before cursor")
-	map("n", "[p", "<Plug>(YankyPutIndentBeforeLinewise)","Put indented before cursor")
-	map("n", ">p", "<Plug>(YankyPutIndentBeforeShiftRight)","Put before and indent right")
-	map("n", "<p", "<Plug>(YankyPutIndentBeforeShiftLeft)","Put before and indent left")
-end
-
-M.lsp = function()
-	local Snacks = require("snacks")
-
-	map("n", "gd", function() Snacks.picker.lsp_definitions() end, "Goto Definition")
-	map("n", "gD", function() Snacks.picker.lsp_declarations() end, "Goto Declaration")
-	map("n", "gr", function() Snacks.picker.lsp_references() end, "References")
-	map("n", "gi", function() Snacks.picker.lsp_implementations() end, "Goto Implementation")
-	map("n", "gt", function() Snacks.picker.lsp_type_definitions() end, "Goto Type Definition")
-	map("n", "<leader>ls", function() Snacks.picker.lsp_symbols() end, "LSP Symbols")
-	map("n", "<leader>lw", function() Snacks.picker.lsp_workspace_symbols() end, "LSP Workspace Symbols")
-	map("n", "<leader>lr", function() vim.lsp.buf.rename() end, "Rename across files")
-	map("n", "<leader>la", function() vim.lsp.buf.code_action() end, "Code actions")
-	-- map("n", "<leader>lf", function() require("conform").format({ lsp_fallback = true }) end, "Format document")
-end
-
-return M
+-- Remove default keymaps
+vim.keymap.del("n", "<leader>K")
+vim.keymap.del("n", "<leader>l")
+vim.keymap.del("n", "<leader>L")
+vim.keymap.del("n", "<leader>`")
+vim.keymap.del("n", "<leader>-")
+vim.keymap.del("n", "<leader>|")
+vim.keymap.del("n", "<leader>/")
+vim.keymap.del("n", "<leader>:")
+vim.keymap.del("n", "<leader><space>")
+vim.keymap.del("n", "<leader>fT")
+vim.keymap.del("n", "<leader>ft")
+vim.keymap.del("n", "<leader><tab>l")
+vim.keymap.del("n", "<leader><tab>o")
+vim.keymap.del("n", "<leader><tab>f")
+vim.keymap.del("n", "<leader><tab><tab>")
+vim.keymap.del("n", "<leader><tab>]")
+vim.keymap.del("n", "<leader><tab>d")
+vim.keymap.del("n", "<leader><tab>[")
+vim.keymap.del("n", "<leader>?")
