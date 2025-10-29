@@ -10,11 +10,6 @@ if type -q zoxide
     zoxide init fish | source
 end
 
-# Initialize fzf key bindings
-if type -q fzf
-    fzf init fish | source
-end
-
 # Initialize mise (development environment manager)
 if type -q mise
     mise activate fish | source
@@ -89,7 +84,6 @@ if type -q gh
 end
 
 # Editor aliases (run neovide in background without blocking terminal)
-alias nvim 'neovide &; disown'
 alias vim 'neovide &; disown'
 alias v 'neovide &; disown'
 
