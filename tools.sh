@@ -574,9 +574,15 @@ setup_configs() {
     fi
     
     # Set up Fish config
-    if [ -f "$(pwd)/fish/config.fish" ]; then
-        ln -sf "$(pwd)/fish/config.fish" ~/.config/fish/config.fish
-        log_success "Fish config linked"
+    if [ -d "$(pwd)/fish" ]; then
+        # Link all .fish files from the fish directory
+        for fish_file in "$(pwd)"/fish/*.fish; do
+            if [ -f "$fish_file" ]; then
+                local filename=$(basename "$fish_file")
+                ln -sf "$fish_file" ~/.config/fish/"$filename"
+                log_success "Fish $filename linked"
+            fi
+        done
     fi
     
     # Set up Neovim config
