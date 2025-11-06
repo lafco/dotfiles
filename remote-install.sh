@@ -86,28 +86,22 @@ main() {
     log_info "Starting dotfiles installation..."
     
     # Check if we're already in the dotfiles directory
-    if [ -f "tools.sh" ] && [ -f "install.sh" ]; then
-        log_info "Running from local dotfiles directory..."
-        chmod +x tools.sh
-        ./tools.sh
-    else
-        log_info "Running remote installation..."
-        echo "Repository: $REPO_URL"
-        echo "Install directory: $DOTFILES_DIR"
-        echo ""
-        
-        # Ensure git is available
-        ensure_git
-        
-        # Setup dotfiles repository
-        setup_dotfiles_repo
-        
-        # Run the main installation script
-        log_info "Running main installation script..."
-        cd "$DOTFILES_DIR"
-        chmod +x tools.sh
-        ./tools.sh
-    fi
+    log_info "Running remote installation..."
+    echo "Repository: $REPO_URL"
+    echo "Install directory: $DOTFILES_DIR"
+    echo ""
+    
+    # Ensure git is available
+    ensure_git
+    
+    # Setup dotfiles repository
+    setup_dotfiles_repo
+    
+    # Run the main installation script
+    log_info "Running main installation script..."
+    cd "$DOTFILES_DIR"
+    chmod +x install.sh
+    ./install.sh
     
     echo ""
     log_success "Remote installation complete!"
@@ -116,7 +110,7 @@ main() {
     echo "🔧 Configuration files linked to ~/.config/"
     echo ""
     echo "To update in the future:"
-    echo "  cd $DOTFILES_DIR && git pull && ./tools.sh"
+    echo "  cd $DOTFILES_DIR && git pull && ./install.sh"
     echo ""
     echo "Or run the remote installer again:"
     echo "  curl -fsSL https://raw.githubusercontent.com/lafco/dotfiles/main/install.sh | bash"
