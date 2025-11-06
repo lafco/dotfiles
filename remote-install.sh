@@ -101,7 +101,7 @@ main() {
     log_info "Running main installation script..."
     cd "$DOTFILES_DIR"
     chmod +x install.sh
-    ./install.sh
+    ./install.sh -q
     
     echo ""
     log_success "Remote installation complete!"

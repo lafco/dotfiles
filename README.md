@@ -9,7 +9,7 @@ curl -fsSL https://raw.githubusercontent.com/lafco/dotfiles/main/remote-install.
 ```bash
 git clone https://github.com/lafco/dotfiles.git
 cd dotfiles
-./tools.sh
+./install.sh
 ```
 ### Development Tools
 - **Wezterm**:
