@@ -2,7 +2,7 @@
 
 #### One-Line Installation
 ```bash
-curl -fsSL https://raw.githubusercontent.com/lafco/dotfiles/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/lafco/dotfiles/main/remote-install.sh | bash
 ```
 
 #### Manual Installation

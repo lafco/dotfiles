@@ -2,125 +2,188 @@
 
 set -e
 
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+# Detect script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Configuration
-REPO_URL="https://github.com/lafco/dotfiles.git"
-DOTFILES_DIR="$HOME/.dotfiles"
+# Source library files (order matters)
+source "$SCRIPT_DIR/tools/lib/utils.sh"
+source "$SCRIPT_DIR/tools/lib/system.sh"
+source "$SCRIPT_DIR/tools/lib/config.sh"
 
-# Helper functions
-log_info() {
-    echo -e "${BLUE}[INFO]${NC} $1"
+# Source all installer files
+for installer in "$SCRIPT_DIR/tools/installers"/*.sh; do
+    source "$installer"
+done
+
+# Show usage information
+help() {
+    echo "Usage: $0 [OPTIONS] [FUNCTION_NAME]"
+    echo ""
+    echo "Options:"
+    echo "  -q, --quiet     Enable quiet mode (suppress package manager output)"
+    echo "  -v, --verbose   Enable verbose mode (show all commands)"
+    echo "  -h, --help      Show this help message"
+    echo ""
+    echo "Available functions:"
+    echo "  core            - Install core development tools (git, curl, etc.)"
+    echo "  git_tools       - Install git tools (GAH, lazygit)"
+    echo "  shell           - Install modern shell tools (ripgrep, fd, bat, etc.)"
+    echo "  runtimes        - Install development runtimes (Node.js, Python, Rust)"
+    echo "  fonts           - Install fonts (JetBrains Mono, FiraCode Nerd Fonts)"
+    echo "  gui             - Install GUI applications (Neovim, Starship)"
+    echo "  system          - Install additional system tools (btop)"
+    echo "  terminal        - Install terminal tools (tmux, wezterm)"
+    echo "  database        - Install and configure PostgreSQL"
+    echo "  configs         - Set up configuration files"
+    echo "  fix_ppas        - Fix broken PPAs (Ubuntu only)"
+    echo ""
+    echo "Legacy function names (backward compatibility):"
+    echo "  core_tools      - Alias for 'core'"
+    echo "  shell_tools     - Alias for 'shell'"
+    echo "  gui_apps        - Alias for 'gui'"
+    echo "  system_tools    - Alias for 'system'"
+    echo "  lazygit         - Install only lazygit"
+    echo "  tmux            - Install only tmux"
+    echo "  wezterm         - Install only wezterm"
+    echo "  postgresql      - Alias for 'database'"
+    echo ""
+    echo "Examples:"
+    echo "  $0                    # Run full installation"
+    echo "  $0 --quiet            # Run full installation in quiet mode"
+    echo "  $0 core               # Install only core tools"
+    echo "  $0 --quiet git_tools  # Install git tools in quiet mode"
+    echo ""
 }
 
-log_success() {
-    echo -e "${GREEN}[SUCCESS]${NC} $1"
-}
+# Run a specific function
+run_function() {
+    local func_name="$1"
 
-log_warning() {
-    echo -e "${YELLOW}[WARNING]${NC} $1"
-}
+    # Always run system detection first
+    detect_system
 
-log_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
-}
-
-# Clone or update dotfiles repository
-setup_dotfiles_repo() {
-    log_info "Setting up dotfiles repository..."
-    
-    if [ -d "$DOTFILES_DIR" ]; then
-        log_info "Dotfiles directory exists, updating..."
-        cd "$DOTFILES_DIR"
-        git pull origin main || git pull origin master
-    else
-        log_info "Cloning dotfiles repository..."
-        git clone "$REPO_URL" "$DOTFILES_DIR"
-        cd "$DOTFILES_DIR"
-    fi
-    
-    log_success "Dotfiles repository ready at $DOTFILES_DIR"
-}
-
-# Check if git is available, install if needed
-ensure_git() {
-    if ! command -v git &> /dev/null; then
-        log_info "Git not found, installing..."
-        
-        if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-            if command -v apt &> /dev/null; then
-                sudo apt update && sudo apt install -y git
-            elif command -v dnf &> /dev/null; then
-                sudo dnf install -y git
-            elif command -v pacman &> /dev/null; then
-                sudo pacman -S --noconfirm git
-            elif command -v zypper &> /dev/null; then
-                sudo zypper install -y git
-            else
-                log_error "Unable to install git automatically. Please install git manually."
-                exit 1
-            fi
-        elif [[ "$OSTYPE" == "darwin"* ]]; then
-            # Check if Homebrew is available
-            if ! command -v brew &> /dev/null; then
-                log_info "Installing Homebrew first..."
-                /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-            fi
-            brew install git
-        else
-            log_error "Unsupported operating system. Please install git manually."
+    case "$func_name" in
+        "core_tools"|"core")
+            detect_and_fix_broken_ppas
+            install_core
+            ;;
+        "git_tools"|"git"|"gah")
+            install_git_tools
+            ;;
+        "lazygit")
+            install_lazygit
+            ;;
+        "shell_tools"|"shell")
+            install_shell
+            ;;
+        "runtimes")
+            install_runtimes
+            ;;
+        "fonts")
+            install_fonts
+            ;;
+        "gui_apps"|"gui")
+            install_gui
+            ;;
+        "system_tools"|"system")
+            install_system
+            ;;
+        "terminal")
+            install_terminal
+            ;;
+        "tmux")
+            install_tmux
+            ;;
+        "wezterm")
+            install_wezterm
+            ;;
+        "database"|"postgresql")
+            install_database
+            ;;
+        "configs")
+            setup_configs
+            ;;
+        "fix_ppas")
+            detect_and_fix_broken_ppas
+            ;;
+        *)
+            log_error "Unknown function: $func_name"
+            help
             exit 1
-        fi
-        
-        log_success "Git installed successfully"
-    fi
+            ;;
+    esac
+
+    log_success "Function '$func_name' completed!"
 }
 
 # Main installation function
 main() {
     log_info "Starting dotfiles installation..."
-    
-    # Check if we're already in the dotfiles directory
-    if [ -f "tools.sh" ] && [ -f "install.sh" ]; then
-        log_info "Running from local dotfiles directory..."
-        chmod +x tools.sh
-        ./tools.sh
-    else
-        log_info "Running remote installation..."
-        echo "Repository: $REPO_URL"
-        echo "Install directory: $DOTFILES_DIR"
-        echo ""
-        
-        # Ensure git is available
-        ensure_git
-        
-        # Setup dotfiles repository
-        setup_dotfiles_repo
-        
-        # Run the main installation script
-        log_info "Running main installation script..."
-        cd "$DOTFILES_DIR"
-        chmod +x tools.sh
-        ./tools.sh
+
+    detect_system
+    detect_and_fix_broken_ppas
+    install_core
+    install_shell
+    install_runtimes
+    install_fonts
+    install_gui
+    install_system
+    install_git_tools
+    install_terminal
+    install_database
+    setup_configs
+    setup_shell_integrations
+
+    # Only change shell to fish if it's not already the default
+    if command -v fish &> /dev/null; then
+        CURRENT_SHELL=$(basename "$SHELL")
+        if [[ "$CURRENT_SHELL" != "fish" ]]; then
+            log_info "Setting fish as default shell..."
+            chsh -s $(which fish)
+            log_success "Default shell changed to fish"
+        else
+            log_info "Fish is already the default shell"
+        fi
     fi
-    
+
     echo ""
-    log_success "Remote installation complete!"
+    log_success "Installation complete!"
+    echo "  - To set Fish as default shell: chsh -s \$(which fish)"
+    echo "  - Run 'mise install' to ensure runtimes are available"
+    echo "  - Connect to PostgreSQL with 'psql'"
+    echo "  - Use 'lazygit' for an interactive git UI"
     echo ""
-    echo "📁 Dotfiles installed to: $DOTFILES_DIR"
-    echo "🔧 Configuration files linked to ~/.config/"
-    echo ""
-    echo "To update in the future:"
-    echo "  cd $DOTFILES_DIR && git pull && ./tools.sh"
-    echo ""
-    echo "Or run the remote installer again:"
-    echo "  curl -fsSL https://raw.githubusercontent.com/lafco/dotfiles/main/install.sh | bash"
+    echo "   Configuration files are linked to ~/.config/"
+    echo "   Edit files in $SCRIPT_DIR to modify configurations"
 }
 
-# Run main function
-main "$@"
+# Parse command line arguments
+FUNC_NAME=""
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -q|--quiet)
+            QUIET_MODE=true
+            shift
+            ;;
+        -v|--verbose)
+            set -x
+            shift
+            ;;
+        -h|--help)
+            help
+            exit 0
+            ;;
+        *)
+            FUNC_NAME="$1"
+            shift
+            ;;
+    esac
+done
+
+# Execute
+if [[ -z "$FUNC_NAME" ]]; then
+    main
+else
+    run_function "$FUNC_NAME"
+fi
