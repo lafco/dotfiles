@@ -1,32 +1,9 @@
-# mise configuration for global development tools
-# This file defines the default runtime versions for development environments
-
 [tools]
-# Node.js - LTS version (automatically tracks latest LTS)
 node = "lts"
-
-# Python - Latest stable version
 python = "latest"
-
-# Rust - Latest stable version (includes rustc, cargo, rustup)
 rust = "latest"
-
-# You can also pin specific versions:
-# node = "20.11.0"
-# python = "3.12.1"
-# rust = "1.75.0"
-
-# Add more tools as needed:
-# bun = "latest"
-# deno = "latest"
-# go = "latest"
-# ruby = "latest"
-# java = "latest"
+"npm:@anthropic-ai/claude-code" = "latest"
 
 [settings]
-# Automatically install missing tools when entering a directory
-# with a .mise.toml or .tool-versions file
 auto_install = true
-
-# Use verbose output for debugging
 verbose = false

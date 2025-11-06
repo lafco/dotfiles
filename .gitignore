@@ -9,12 +9,13 @@ composer.lock
 Gemfile.lock
 poetry.lock
 Cargo.lock
-.claude
 CLAUDE.md
 tt.*
 .tests
 doc/tags
 debug
+file-history
+history.jsonl
 .repro
 foo.*
 *.log

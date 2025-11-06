@@ -30,10 +30,6 @@ if type -q rg
     alias grep 'rg'
 end
 
-# Editor aliases (run neovide in background without blocking terminal)
-alias vim 'neovide &; disown'
-alias v 'neovide &; disown'
-
 # File and directory operations
 alias mkcd 'function _mkcd; mkdir -p $argv[1]; and cd $argv[1]; end; _mkcd'
 alias own 'sudo chown -R $USER:$USER'

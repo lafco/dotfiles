@@ -12,9 +12,8 @@ cd dotfiles
 ./tools.sh
 ```
 ### Development Tools
-- **Ghostty**:
+- **Wezterm**:
 - **Fish Shell**:
-- **Neovide**:
 - **mise**:
 - **GitHub CLI (gh)**:
 - **lazygit**:

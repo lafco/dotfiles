@@ -397,29 +397,8 @@ install_gui_apps() {
             ;;
         "brew")
             $INSTALL_CMD neovim
-            # Install GUI apps on macOS
-            brew install --cask neovide
             ;;
     esac
-    
-    # Install Neovide on Linux
-    if [[ "$OS" != "macos" ]] && ! command -v neovide &> /dev/null; then
-        log_info "Installing Neovide..."
-        case $PKG_MANAGER in
-            "pacman")
-                sudo pacman -S neovide
-                ;;
-            *)
-                # Install from releases for other distros
-                NEOVIDE_URL="https://github.com/neovide/neovide/releases/latest/download/neovide.tar.gz"
-                TEMP_DIR=$(mktemp -d)
-                curl -L -o "$TEMP_DIR/neovide.tar.gz" "$NEOVIDE_URL"
-                tar -xzf "$TEMP_DIR/neovide.tar.gz" -C "$TEMP_DIR"
-                sudo cp "$TEMP_DIR/neovide" /usr/local/bin/
-                rm -rf "$TEMP_DIR"
-                ;;
-        esac
-    fi
     
     # Install Starship prompt
     if ! command -v starship &> /dev/null; then
@@ -507,6 +486,82 @@ install_lazygit() {
     log_success "lazygit installed"
 }
 
+# Install tmux
+install_tmux() {
+    log_info "Installing tmux..."
+
+    case $PKG_MANAGER in
+        "apt"|"dnf"|"pacman"|"zypper")
+            $INSTALL_CMD tmux
+            ;;
+        "brew")
+            $INSTALL_CMD tmux
+            ;;
+    esac
+
+    log_success "tmux installed"
+}
+
+# Install WezTerm
+install_wezterm() {
+    log_info "Installing WezTerm..."
+
+    case $PKG_MANAGER in
+        "apt")
+            log_info "Installing WezTerm AppImage..."
+            curl -LO https://github.com/wez/wezterm/releases/download/nightly/WezTerm-nightly-Ubuntu20.04.AppImage
+            chmod u+x WezTerm-nightly-Ubuntu20.04.AppImage
+            sudo mkdir -p /usr/local/bin
+            sudo mv WezTerm-nightly-Ubuntu20.04.AppImage /usr/local/bin/wezterm
+
+            # Extract icon from AppImage
+            log_info "Extracting WezTerm icon..."
+            mkdir -p ~/.local/share/icons/hicolor/128x128/apps
+            /usr/local/bin/wezterm --extract-icon > ~/.local/share/icons/hicolor/128x128/apps/wezterm.png 2>/dev/null || \
+                curl -L -o ~/.local/share/icons/hicolor/128x128/apps/wezterm.png https://raw.githubusercontent.com/wez/wezterm/main/assets/icon/terminal.png
+
+            # Create desktop entry
+            log_info "Creating desktop entry..."
+            mkdir -p ~/.local/share/applications
+            cat > ~/.local/share/applications/wezterm.desktop <<EOF
+[Desktop Entry]
+Name=WezTerm
+Comment=Wez's Terminal Emulator
+Exec=/usr/local/bin/wezterm start
+Icon=wezterm
+Type=Application
+Categories=System;TerminalEmulator;
+Terminal=false
+StartupNotify=true
+EOF
+            chmod +x ~/.local/share/applications/wezterm.desktop
+
+            # Update desktop database
+            if command -v update-desktop-database &> /dev/null; then
+                update-desktop-database ~/.local/share/applications
+            fi
+            ;;
+        "dnf")
+            log_info "Installing WezTerm from Copr..."
+            sudo dnf copr enable wezfurlong/wezterm-nightly -y
+            $INSTALL_CMD wezterm
+            ;;
+        "pacman")
+            # WezTerm is available in the AUR and community repos
+            $INSTALL_CMD wezterm
+            ;;
+        "zypper")
+            log_warning "WezTerm installation on openSUSE requires manual download"
+            log_info "Visit: https://wezfurlong.org/wezterm/install/linux.html"
+            ;;
+        "brew")
+            $INSTALL_CMD --cask wezterm
+            ;;
+    esac
+
+    log_success "WezTerm installed"
+}
+
 # Install PostgreSQL
 install_postgresql() {
     log_info "Installing PostgreSQL..."
@@ -563,54 +618,102 @@ install_postgresql() {
 # Set up configuration files
 setup_configs() {
     log_info "Setting up configuration files..."
-    
-    # Create config directories
-    mkdir -p ~/.config/{fish,nvim,starship,neovide,ghostty,mise}
-    
+
+    local DOTFILES_DIR="$(pwd)"
+
     # Set up Starship config
-    if [ -f "$(pwd)/starship.toml" ]; then
-        ln -sf "$(pwd)/starship.toml" ~/.config/starship.toml
+    if [ -f "$DOTFILES_DIR/starship.toml" ]; then
+        mkdir -p ~/.config
+        ln -sf "$DOTFILES_DIR/starship.toml" ~/.config/starship.toml
         log_success "Starship config linked"
     fi
-    
+
     # Set up Fish config
-    if [ -d "$(pwd)/fish" ]; then
+    if [ -d "$DOTFILES_DIR/fish" ]; then
+        mkdir -p ~/.config/fish
+        # Remove existing symlink or directory if it's a full link
+        if [ -L ~/.config/fish ] && [ "$(readlink ~/.config/fish)" = "$DOTFILES_DIR/fish" ]; then
+            rm ~/.config/fish
+        fi
+
         # Link all .fish files from the fish directory
-        for fish_file in "$(pwd)"/fish/*.fish; do
+        for fish_file in "$DOTFILES_DIR"/fish/*.fish; do
             if [ -f "$fish_file" ]; then
                 local filename=$(basename "$fish_file")
                 ln -sf "$fish_file" ~/.config/fish/"$filename"
                 log_success "Fish $filename linked"
             fi
         done
+
+        # Link functions directory if it exists
+        if [ -d "$DOTFILES_DIR/fish/functions" ]; then
+            ln -sf "$DOTFILES_DIR/fish/functions" ~/.config/fish/functions
+            log_success "Fish functions directory linked"
+        fi
     fi
-    
+
     # Set up Neovim config
-    if [ -d "$(pwd)/nvim" ]; then
-        if [ -d ~/.config/nvim ]; then
+    if [ -d "$DOTFILES_DIR/nvim" ]; then
+        if [ -d ~/.config/nvim ] && [ ! -L ~/.config/nvim ]; then
             log_warning "Backing up existing Neovim config to ~/.config/nvim.backup"
             mv ~/.config/nvim ~/.config/nvim.backup
+        elif [ -L ~/.config/nvim ]; then
+            rm ~/.config/nvim
         fi
-        ln -sf "$(pwd)/nvim" ~/.config/nvim
+        ln -sf "$DOTFILES_DIR/nvim" ~/.config/nvim
         log_success "Neovim config linked"
     fi
-    
-    # Set up Neovide config
-    if [ -f "$(pwd)/neovide/config.toml" ]; then
-        ln -sf "$(pwd)/neovide/config.toml" ~/.config/neovide/config.toml
-        log_success "Neovide config linked"
-    fi
-    
+
     # Set up mise config
-    if [ -f "$(pwd)/.mise.toml" ]; then
-        ln -sf "$(pwd)/.mise.toml" ~/.config/mise/config.toml
+    if [ -f "$DOTFILES_DIR/.mise.toml" ]; then
+        mkdir -p ~/.config/mise
+        ln -sf "$DOTFILES_DIR/.mise.toml" ~/.config/mise/config.toml
         log_success "Mise config linked"
     fi
-    
-    # Set up Ghostty config if available
-    if [ -f "$(pwd)/ghostty/config" ]; then
-        ln -sf "$(pwd)/ghostty/config" ~/.config/ghostty/config
-        log_success "Ghostty config linked"
+
+    # Set up Ghostty config
+    if [ -d "$DOTFILES_DIR/ghostty" ]; then
+        mkdir -p ~/.config/ghostty
+        if [ -f "$DOTFILES_DIR/ghostty/config" ]; then
+            ln -sf "$DOTFILES_DIR/ghostty/config" ~/.config/ghostty/config
+            log_success "Ghostty config linked"
+        fi
+    fi
+
+    # Set up tmux config
+    if [ -d "$DOTFILES_DIR/tmux" ]; then
+        if [ -L ~/.config/tmux ]; then
+            rm ~/.config/tmux
+        elif [ -d ~/.config/tmux ] && [ ! -L ~/.config/tmux ]; then
+            log_warning "Backing up existing tmux config to ~/.config/tmux.backup"
+            mv ~/.config/tmux ~/.config/tmux.backup
+        fi
+        ln -sf "$DOTFILES_DIR/tmux" ~/.config/tmux
+        log_success "tmux config linked"
+    fi
+
+    # Set up WezTerm config
+    if [ -d "$DOTFILES_DIR/wezterm" ]; then
+        if [ -L ~/.config/wezterm ]; then
+            rm ~/.config/wezterm
+        elif [ -d ~/.config/wezterm ] && [ ! -L ~/.config/wezterm ]; then
+            log_warning "Backing up existing WezTerm config to ~/.config/wezterm.backup"
+            mv ~/.config/wezterm ~/.config/wezterm.backup
+        fi
+        ln -sf "$DOTFILES_DIR/wezterm" ~/.config/wezterm
+        log_success "WezTerm config linked"
+    fi
+
+    # Set up Hyprland config if available
+    if [ -d "$DOTFILES_DIR/hypr" ]; then
+        if [ -L ~/.config/hypr ]; then
+            rm ~/.config/hypr
+        elif [ -d ~/.config/hypr ] && [ ! -L ~/.config/hypr ]; then
+            log_warning "Backing up existing Hyprland config to ~/.config/hypr.backup"
+            mv ~/.config/hypr ~/.config/hypr.backup
+        fi
+        ln -sf "$DOTFILES_DIR/hypr" ~/.config/hypr
+        log_success "Hyprland config linked"
     fi
 }
 
@@ -639,9 +742,11 @@ help() {
     echo "  shell_tools     - Install modern shell tools (ripgrep, fd, bat, etc.)"
     echo "  runtimes        - Install development runtimes (Node.js, Python, Rust)"
     echo "  fonts           - Install fonts (JetBrains Mono, FiraCode Nerd Fonts)"
-    echo "  gui_apps        - Install GUI applications (Neovim, Neovide, Starship)"
+    echo "  gui_apps        - Install GUI applications (Neovim, Starship)"
     echo "  system_tools    - Install additional system tools (btop)"
     echo "  lazygit         - Install lazygit terminal UI for git"
+    echo "  tmux            - Install tmux terminal multiplexer"
+    echo "  wezterm         - Install WezTerm terminal emulator"
     echo "  postgresql      - Install and configure PostgreSQL"
     echo "  configs         - Set up configuration files"
     echo "  fix_ppas        - Fix broken PPAs (Ubuntu only)"
@@ -689,6 +794,12 @@ run_function() {
         "lazygit")
             install_lazygit
             ;;
+        "tmux")
+            install_tmux
+            ;;
+        "wezterm")
+            install_wezterm
+            ;;
         "postgresql")
             install_postgresql
             ;;
@@ -721,6 +832,8 @@ main() {
     install_gui_apps
     install_system_tools
     install_lazygit
+    install_tmux
+    install_wezterm
     install_postgresql
     setup_configs
     setup_shell_integrations
