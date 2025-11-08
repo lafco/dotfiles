@@ -1,27 +1,27 @@
 local wezterm = require 'wezterm'
-local commands = require 'commands'
+local theme = require 'tokyonight'
 
 local config = wezterm.config_builder()
 
 -- Font settings
-config.font_size = 11
-config.line_height = 1
+config.font_size = 10
+config.line_height = 1.1
 config.font = wezterm.font_with_fallback {
   { family = 'Jetbrains Mono' },
-  { family = 'Symbols Nerd Font Mono' },
 }
 
 -- Colors
-config.color_scheme = 'Catppuccin Mocha'
+config.colors = theme
+-- config.color_scheme = 'Catppuccin Mocha'
 
 -- Appearance
 config.cursor_blink_rate = 0
 -- config.window_decorations = 'RESIZE'
 config.hide_tab_bar_if_only_one_tab = true
 config.window_padding = {
-  left = 10,
-  right = 10,
-  top = 0,
+  left = 5,
+  right = 5,
+  top = 5,
   bottom = 5,
 }
 
