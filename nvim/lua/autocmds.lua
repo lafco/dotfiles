@@ -18,54 +18,54 @@ autocmd("BufWritePre", {
   command = "%s/\\s\\+$//e",
 })
 
-autocmd("CmdlineEnter", {
-  desc = "Apply highlights during search and replace",
-  group = augroup("apply_highlights"),
-  pattern = { "/", "?" },
-  callback = function()
-    vim.o.hlsearch = true
-  end,
-})
+-- autocmd("CmdlineEnter", {
+--   desc = "Apply highlights during search and replace",
+--   group = augroup("apply_highlights"),
+--   pattern = { "/", "?" },
+--   callback = function()
+--     vim.o.hlsearch = true
+--   end,
+-- })
 
-autocmd("CmdlineLeave", {
-  desc = "Clear highlights after search and replace",
-  group = augroup("clear_highlights"),
-  pattern = { "/", "?" },
-  callback = function()
-    vim.o.hlsearch = false
-  end,
-})
+-- autocmd("CmdlineLeave", {
+--   desc = "Clear highlights after search and replace",
+--   group = augroup("clear_highlights"),
+--   pattern = { "/", "?" },
+--   callback = function()
+--     vim.o.hlsearch = false
+--   end,
+-- })
 
-autocmd("BufReadPost", {
-  desc = "Jump to the last known position of a file before closing it",
-  group = augroup("buffer_checkpoint"),
-  callback = function()
-    local mark = vim.api.nvim_buf_get_mark(0, '"')
-    local line_count = vim.api.nvim_buf_line_count(0)
+-- autocmd("BufReadPost", {
+--   desc = "Jump to the last known position of a file before closing it",
+--   group = augroup("buffer_checkpoint"),
+--   callback = function()
+--     local mark = vim.api.nvim_buf_get_mark(0, '"')
+--     local line_count = vim.api.nvim_buf_line_count(0)
 
-    if mark[1] > 0 and mark[1] <= line_count then
-      pcall(vim.api.nvim_win_set_cursor, 0, mark)
-    end
-  end,
-})
+--     if mark[1] > 0 and mark[1] <= line_count then
+--       pcall(vim.api.nvim_win_set_cursor, 0, mark)
+--     end
+--   end,
+-- })
 
-autocmd("VimResized", {
-  desc = "Resize the splits if the window is resized",
-  group = augroup("resize_splits"),
-  callback = function()
-    vim.cmd("tabdo wincmd =")
-  end,
-})
+-- autocmd("VimResized", {
+--   desc = "Resize the splits if the window is resized",
+--   group = augroup("resize_splits"),
+--   callback = function()
+--     vim.cmd("tabdo wincmd =")
+--   end,
+-- })
 
-autocmd("FileType", {
-  desc = "Close some filetypes simply by pressing 'q'",
-  group = augroup("close_with_q"),
-  pattern = { "checkhealth", "help", "lspinfo", "man", "notify", "qf", "query" },
-  callback = function(event)
-    vim.bo[event.buf].buflisted = false
-    vim.keymap.set("n", "q", "<cmd>close<cr>", { buffer = event.buf, silent = true })
-  end,
-})
+-- autocmd("FileType", {
+--   desc = "Close some filetypes simply by pressing 'q'",
+--   group = augroup("close_with_q"),
+--   pattern = { "checkhealth", "help", "lspinfo", "man", "notify", "qf", "query" },
+--   callback = function(event)
+--     vim.bo[event.buf].buflisted = false
+--     vim.keymap.set("n", "q", "<cmd>close<cr>", { buffer = event.buf, silent = true })
+--   end,
+-- })
 -- autocmd("FocusLost", {
 --   desc = "Save/write all unsaved buffers when focus is lost",
 --   group = augroup("save_buffers"),

@@ -1,6 +1,7 @@
 return {
   { -- Useful plugin to show you pending keybinds.
     'folke/which-key.nvim',
+    lazy = true,
     event = 'VimEnter', -- Sets the loading event to 'VimEnter'
     opts = {
       delay = 200,
@@ -26,9 +27,12 @@ return {
         },
       },
       spec = {
-        { '<leader>s', group = '[S]earch' },
-        { '<leader>t', group = '[T]oggle' },
-        { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
+        { '<leader>f', group = 'Telescope' },
+        { '<leader>t', group = 'Toggle' },
+        { '<leader>b', group = 'Buffers' },
+        { '<leader>d', group = 'Debug' },
+        { '<leader>g', group = 'Git' },
+        { '<leader>h', group = 'Hunks', mode = { 'n', 'v' }, icon = " " },
       },
     },
   },

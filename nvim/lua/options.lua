@@ -21,6 +21,7 @@ vim.opt.foldmethod = "indent"
 vim.opt.foldtext = ""
 vim.opt.ignorecase = true -- Ignore case
 vim.opt.inccommand = "nosplit" -- preview incremental substitute
+vim.opt.cmdheight = 0 -- Only show cmd line when necessary
 vim.opt.jumpoptions = "view"
 vim.opt.laststatus = 3 -- global statusline
 vim.opt.linebreak = true -- Wrap lines at convenient points

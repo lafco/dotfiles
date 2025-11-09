@@ -22,7 +22,6 @@ vim.g.loaded_perl_provider = 0
 vim.g.loaded_node_provider = 0
 
 require("lazy").setup("plugins", {
-  defaults = { lazy = true }, -- Make all plugins to be lazy-loaded.
   performance = {
     rtp = {
       disabled_plugins = { -- Disable certain in-built plugins which are useful af.

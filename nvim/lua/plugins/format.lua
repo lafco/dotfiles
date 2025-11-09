@@ -5,12 +5,9 @@ return { -- Autoformat
     cmd = { 'ConformInfo' },
     keys = {
       {
-        '<leader>xf',
-        function()
+        '<leader>c', function()
           require('conform').format { async = true, lsp_format = 'fallback' }
-        end,
-        mode = '',
-        desc = '[F]ormat buffer',
+        end, mode = 'n', desc = 'Format buffer'
       },
     },
     opts = {

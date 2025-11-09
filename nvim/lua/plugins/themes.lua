@@ -1,7 +1,6 @@
 return {
   {
     'folke/tokyonight.nvim',
-    lazy = false,
     priority = 1000, -- Make sure to load this before all the other start plugins.
     config = function()
       ---@diagnostic disable-next-line: missing-fields
@@ -19,21 +18,11 @@ return {
           hl.TelescopePreviewNormal = { bg = colors.black }
           hl.TelescopePreviewBorder = { bg = colors.black, fg = colors.black }
           hl.TelescopePreviewTitle = { fg = colors.black, bg = colors.hint }
-          -- Neotree
-          hl.NeoTreeRootName = { fg = colors.pink, }
-          hl.NeoTreeGitAdded = { fg = colors.green }
-          hl.NeoTreeGitConflict = { fg = colors.red }
-          hl.NeoTreeGitDeleted = { fg = colors.red }
-          hl.NeoTreeGitIgnored = { fg = colors.overlay0 }
-          hl.NeoTreeGitModified = { fg = colors.yellow }
-          hl.NeoTreeGitUnstaged = { fg = colors.red }
-          hl.NeoTreeGitUntracked = { fg = colors.blue }
-          hl.NeoTreeGitStaged = { fg = colors.green }
           -- blink.cmp
-          hl.BlinkCmpMenuSelection = { fg = colors.base, bg = colors.db_dark }
-          hl.BlinkCmpMenuBorder = { fg = colors.base }
-          hl.BlinkCmpDocBorder = { fg = colors.base }
-          hl.BlinkCmpSignatureHelpBorder = { fg = colors.yellow }
+          -- hl.BlinkCmpMenuSelection = { fg = colors.base, bg = colors.db_dark }
+          -- hl.BlinkCmpMenuBorder = { fg = colors.base }
+          -- hl.BlinkCmpDocBorder = { fg = colors.base }
+          -- hl.BlinkCmpSignatureHelpBorder = { fg = colors.yellow }
         end
       }
       vim.cmd.colorscheme 'tokyonight-moon'
