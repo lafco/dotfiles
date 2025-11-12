@@ -77,8 +77,68 @@ EOF
     log_success "WezTerm installed"
 }
 
+# Install Zellij
+install_zellij() {
+    log_info "Installing Zellij..."
+
+    case $PKG_MANAGER in
+        "apt"|"dnf"|"zypper")
+            log_info "Installing Zellij from GitHub releases..."
+            # Get latest release
+            ZELLIJ_VERSION=$(curl -s https://api.github.com/repos/zellij-org/zellij/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+            ARCH=$(uname -m)
+            case $ARCH in
+                "x86_64") ZELLIJ_ARCH="x86_64-unknown-linux-musl" ;;
+                "aarch64") ZELLIJ_ARCH="aarch64-unknown-linux-musl" ;;
+                *) log_error "Unsupported architecture: $ARCH"; return 1 ;;
+            esac
+            
+            # Create temporary directory to avoid conflicts
+            TEMP_DIR=$(mktemp -d)
+            cd "$TEMP_DIR"
+            
+            curl -L "https://github.com/zellij-org/zellij/releases/download/${ZELLIJ_VERSION}/zellij-${ZELLIJ_ARCH}.tar.gz" -o zellij.tar.gz
+            tar -xzf zellij.tar.gz
+            
+            # Install to user's local bin directory
+            mkdir -p ~/.local/bin
+            mv zellij ~/.local/bin/
+            
+            # Clean up
+            cd - > /dev/null
+            rm -rf "$TEMP_DIR"
+            
+            # Add ~/.local/bin to PATH if not already there
+            if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+                log_info "Adding ~/.local/bin to PATH..."
+                
+                # Add to bashrc for bash users
+                echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+                
+                # Add to fish config if fish is available
+                if command -v fish &> /dev/null; then
+                    mkdir -p ~/.config/fish
+                    echo 'set -gx PATH $HOME/.local/bin $PATH' >> ~/.config/fish/config.fish
+                    log_info "Added ~/.local/bin to fish PATH"
+                fi
+                
+                export PATH="$HOME/.local/bin:$PATH"
+            fi
+            ;;
+        "pacman")
+            pkg_install zellij
+            ;;
+        "brew")
+            pkg_install zellij
+            ;;
+    esac
+
+    log_success "Zellij installed"
+}
+
 # Main function to install all terminal tools
 install_terminal() {
     install_tmux
     install_wezterm
+    install_zellij
 }

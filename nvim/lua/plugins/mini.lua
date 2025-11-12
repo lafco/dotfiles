@@ -1,6 +1,5 @@
 return {
   'nvim-mini/mini.nvim',
-  priority = 999,
   config = function()
     require('mini.icons').setup()
     require('mini.files').setup()

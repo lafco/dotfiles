@@ -45,6 +45,7 @@ help() {
     echo "  lazygit         - Install only lazygit"
     echo "  tmux            - Install only tmux"
     echo "  wezterm         - Install only wezterm"
+    echo "  zellij          - Install only zellij"
     echo "  postgresql      - Alias for 'database'"
     echo ""
     echo "Examples:"
@@ -96,6 +97,9 @@ run_function() {
             ;;
         "wezterm")
             install_wezterm
+            ;;
+        "zellij")
+            install_zellij
             ;;
         "database"|"postgresql")
             install_database

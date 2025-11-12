@@ -29,9 +29,14 @@ if test -d ~/.config/fish/functions
     set -p fish_function_path ~/.config/fish/functions
 end
 
-# Auto-start tmux for interactive shells
-if status is-interactive
-    and not set -q TMUX
-    and command -v tmux &> /dev/null
-    exec tmux new-session -A -s main
+# Add ~/.local/bin to PATH for user-installed binaries (like zellij)
+if test -d ~/.local/bin
+    set -gx PATH ~/.local/bin $PATH
 end
+
+# Auto-start tmux for interactive shells
+# if status is-interactive
+#     and not set -q TMUX
+#     and command -v tmux &> /dev/null
+#     exec tmux new-session -A -s main
+# end

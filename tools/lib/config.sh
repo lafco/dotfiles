@@ -91,6 +91,18 @@ setup_configs() {
         log_success "WezTerm config linked"
     fi
 
+    # Set up Zellij config
+    if [ -d "$DOTFILES_DIR/zellij" ]; then
+        if [ -L ~/.config/zellij ]; then
+            rm ~/.config/zellij
+        elif [ -d ~/.config/zellij ] && [ ! -L ~/.config/zellij ]; then
+            log_warning "Backing up existing Zellij config to ~/.config/zellij.backup"
+            mv ~/.config/zellij ~/.config/zellij.backup
+        fi
+        ln -sf "$DOTFILES_DIR/zellij" ~/.config/zellij
+        log_success "Zellij config linked"
+    fi
+
     # Set up Hyprland config if available
     if [ -d "$DOTFILES_DIR/hypr" ]; then
         if [ -L ~/.config/hypr ]; then

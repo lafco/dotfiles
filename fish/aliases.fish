@@ -19,6 +19,10 @@ if type -q zoxide
     alias cdi 'zi'  # Interactive selection
 end
 
+if type -q zellij
+    alias zj zellij
+end
+
 # bat (cat replacement) aliases
 if type -q bat
     alias cat 'bat --style=auto'

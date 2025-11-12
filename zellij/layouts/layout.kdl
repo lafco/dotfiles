@@ -1,0 +1,15 @@
+layout {
+  pane_frames {
+    hide_session_name true
+  }
+  pane split_direction="vertical" {
+    pane {
+      size "33%"
+    }
+    pane  {
+      focus true
+      command "nvim"
+      args "."
+    }
+  }
+}
