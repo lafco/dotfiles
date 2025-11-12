@@ -15,8 +15,9 @@ This directory contains installation scripts for setting up a complete developme
 | Command | Installs |
 |---------|----------|
 | `./install.sh core` | curl, wget, git, tree, htop, unzip, jq, build-essential |
-| `./install.sh shell` | ripgrep, fd-find, bat, eza, fish, zoxide, fzf, gh |
-| `./install.sh git_tools` | GAH (GitHub Apt Helper), lazygit |
+| `./install.sh shell` | ripgrep, fd-find, bat, eza, fish, zoxide, fzf, gh, atuin |
+| `./install.sh git_tools` | GAH (GitHub Apt Helper), lazygit, jujutsu (jj) |
+| `./install.sh ai_tools` | OpenCode AI coding agent, Claude Code CLI |
 | `./install.sh runtimes` | mise, Rust, Node.js LTS, Python latest |
 | `./install.sh fonts` | JetBrains Mono Nerd Font, FiraCode Nerd Font |
 | `./install.sh gui` | Neovim, Starship prompt |
@@ -33,6 +34,11 @@ This directory contains installation scripts for setting up a complete developme
 | `./install.sh wezterm` | WezTerm terminal emulator |
 | `./install.sh zellij` | Zellij terminal multiplexer |
 | `./install.sh lazygit` | lazygit TUI for git |
+| `./install.sh jujutsu` | jujutsu (jj) version control system |
+| `./install.sh opencode` | OpenCode AI coding agent |
+| `./install.sh claude` | Claude Code CLI |
+| `./install.sh jq` | jq JSON processor |
+| `./install.sh atuin` | atuin enhanced shell history |
 
 ## Legacy Aliases
 

@@ -26,8 +26,9 @@ help() {
     echo ""
     echo "Available functions:"
     echo "  core            - Install core development tools (git, curl, etc.)"
-    echo "  git_tools       - Install git tools (GAH, lazygit)"
-    echo "  shell           - Install modern shell tools (ripgrep, fd, bat, etc.)"
+    echo "  git_tools       - Install git tools (GAH, lazygit, jujutsu)"
+    echo "  ai_tools        - Install AI tools (OpenCode, Claude Code)"
+    echo "  shell           - Install modern shell tools (ripgrep, fd, bat, atuin, etc.)"
     echo "  runtimes        - Install development runtimes (Node.js, Python, Rust)"
     echo "  fonts           - Install fonts (JetBrains Mono, FiraCode Nerd Fonts)"
     echo "  gui             - Install GUI applications (Neovim, Starship)"
@@ -43,6 +44,11 @@ help() {
     echo "  gui_apps        - Alias for 'gui'"
     echo "  system_tools    - Alias for 'system'"
     echo "  lazygit         - Install only lazygit"
+    echo "  jujutsu         - Install only jujutsu (jj)"
+    echo "  opencode        - Install only OpenCode AI agent"
+    echo "  claude          - Install only Claude Code CLI"
+    echo "  jq              - Install only jq JSON processor"
+    echo "  atuin           - Install only atuin shell history"
     echo "  tmux            - Install only tmux"
     echo "  wezterm         - Install only wezterm"
     echo "  zellij          - Install only zellij"
@@ -71,8 +77,26 @@ run_function() {
         "git_tools"|"git"|"gah")
             install_git_tools
             ;;
+        "ai_tools"|"ai")
+            install_ai_tools
+            ;;
         "lazygit")
             install_lazygit
+            ;;
+        "jujutsu"|"jj")
+            install_jujutsu
+            ;;
+        "opencode")
+            install_opencode
+            ;;
+        "claude"|"claude_code")
+            install_claude_code
+            ;;
+        "jq")
+            install_core
+            ;;
+        "atuin")
+            install_atuin
             ;;
         "shell_tools"|"shell")
             install_shell
@@ -133,6 +157,7 @@ main() {
     install_gui
     install_system
     install_git_tools
+    install_ai_tools
     install_terminal
     install_database
     setup_configs

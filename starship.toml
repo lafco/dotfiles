@@ -11,9 +11,13 @@ $directory$git_branch$git_status
 $character"""
 
 [character]
-# Note the use of Catppuccin color 'peach'
-success_symbol = "[[󰄛](green) ❯](peach)"
-error_symbol = "[[󰄛](red) ❯](peach)"
+disabled = false
+success_symbol = '[  ❯](bold green)'
+error_symbol = '[  ❯](bold red)'
+vimcmd_symbol = '[N ❯](bold green)'
+vimcmd_replace_one_symbol = '[R ❯](bold mauve)'
+vimcmd_replace_symbol = '[R ❯](bold mauve)'
+vimcmd_visual_symbol = '[V ❯](bold yellow)'
 
 [git_branch]
 style = "bold mauve"

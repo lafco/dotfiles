@@ -34,9 +34,5 @@ if test -d ~/.local/bin
     set -gx PATH ~/.local/bin $PATH
 end
 
-# Auto-start tmux for interactive shells
-# if status is-interactive
-#     and not set -q TMUX
-#     and command -v tmux &> /dev/null
-#     exec tmux new-session -A -s main
-# end
+# opencode
+fish_add_path /home/vinicius.falconi@sp01.local/.opencode/bin
