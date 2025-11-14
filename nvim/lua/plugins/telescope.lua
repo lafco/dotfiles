@@ -7,37 +7,23 @@ return {
 			{ "<leader>ff", "<cmd>Telescope find_files<cr>", desc = "Find files" },
 			{ "<leader>fg", "<cmd>Telescope live_grep<cr>", desc = "Live grep" },
 			{ "<leader>fo", "<cmd>Telescope oldfiles<cr>", desc = "Old files" },
+			{ "<leader>fr", "<cmd>Telescope resume<cr>", desc = "Resume search" },
 			{ "<leader>fw", "<cmd>Telescope grep_string<cr>", desc = "Word under cursor" },
 			{ "<leader>fz", "<cmd>Telescope zoxide list<cr>", desc = "Directories" },
 			{ "<leader>fu", "<cmd>Telescope undo<cr>", desc = "Undo" },
-			{
-				"<leader>gc",
-				"<cmd>Telescope advanced_git_search changed_on_branch<cr>",
-				desc = "Changed on current branch",
-			},
+
+			{ "<leader>gc", "<cmd>Telescope advanced_git_search changed_on_branch<cr>", desc = "Changed on current branch" },
 			{ "<leader>gr", "<cmd>Telescope advanced_git_search checkout_reflog<cr>", desc = "Checkout reflog" },
 			{ "<leader>gb", "<cmd>Telescope advanced_git_search diff_branch_file<cr>", desc = "Local branches" },
 			{ "<leader>gl", "<cmd>Telescope advanced_git_search diff_commit_line<cr>", desc = "Diff line commit" },
 			{ "<leader>gf", "<cmd>Telescope advanced_git_search diff_commit_file<cr>", desc = "List file commit" },
-			{
-				"<leader>gs",
-				"<cmd>Telescope advanced_git_search search_log_content_file<cr>",
-				desc = "File previous commits",
-			},
+			{ "<leader>gs", "<cmd>Telescope advanced_git_search search_log_content_file<cr>", desc = "File previous commits" },
 			-- { '<leader>gg', '<cmd>Telescope advanced_git_search search_log_content<cr>', desc = 'List all commits' },
+ 
 			{ "<leader>r", "<cmd>Telescope yank_history<cr>", mode = { "n", "x" }, desc = "Registers" },
 			{ "<leader>k", "<cmd>Telescope keymaps<cr>", desc = "Keymaps" },
       { '<leader>fm', '<cmd>Telescope marks<cr>', desc = 'List marks' },
-			{
-				"<leader>/",
-				function()
-					require("telescope.builtin").live_grep({
-						grep_open_files = true,
-						prompt_title = "Grep open buffers",
-					})
-				end,
-				desc = "Search in open buffers",
-			},
+			{ "<leader>/", function() require("telescope.builtin").live_grep({ grep_open_files = true, prompt_title = "Grep open buffers" }) end, desc = "Search in open buffers" },
 		},
 		dependencies = {
 			"nvim-lua/plenary.nvim",

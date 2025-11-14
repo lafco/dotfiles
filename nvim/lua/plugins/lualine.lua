@@ -3,8 +3,11 @@ return {
     "nvim-lualine/lualine.nvim",
     VeryLazy = true,
     dependencies = {
-      "nvim-mini/mini.icons"
-      -- "nvim-tree/nvim-web-devicons",
+      "nvim-mini/mini.icons",
+      "kristoferssolo/lualine-harpoon.nvim",
+      dependencies = {
+        { "ThePrimeagen/harpoon", branch = "harpoon2" }
+      },
     },
     config = function()
       require("mini.icons").setup()
@@ -41,6 +44,12 @@ return {
       
       local colors = get_current_colorscheme_colors()
       require('lualine').setup({
+        sections = {
+          lualine_c = {
+            "filename",
+            "harpoon",
+          },
+        },
         options = {
           theme = {
             normal = {

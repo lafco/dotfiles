@@ -34,8 +34,8 @@ map("n", "<leader>bd", "<cmd>:bd<cr>", { desc = "Delete Buffer and Window" })
 
 -- Clear search and stop snippet on escape
 map({ "i", "n", "s" }, "<esc>", function()
-  vim.cmd("noh")
-  return "<esc>"
+	vim.cmd("noh")
+	return "<esc>"
 end, { expr = true, desc = "Escape and Clear hlsearch" })
 
 -- https://github.com/mhinz/vim-galore#saner-behavior-of-n-and-n
@@ -54,36 +54,41 @@ map("i", ";", ";<c-g>u")
 -- save file
 map({ "i", "x", "n", "s" }, "<C-s>", "<cmd>w<cr><esc>", { desc = "Save File" })
 
+-- better scroll
+map("n", "<C-d>", "<C-d>zz", {desc = "Center cursor after scroll down"})
+map("n", "<C-u>", "<C-u>zz", {desc = "Center cursor after scroll up"})
+
 -- better indenting
 map("x", "<", "<gv")
 map("x", ">", ">gv")
 
 -- empty line
-map("n", "[<space>", ":<c-u>put! =repeat(nr2char(10), v:count1)<cr>'[", { expr = true, desc = "Add empty line above" })
-map("n", "]<space>", ":<c-u>put =repeat(nr2char(10), v:count1)<cr>", { expr = true, desc = "Add empty line below" })
+map("n", "[<space>", "O<esc>j", { expr = true, desc = "Add empty line above" })
+map("n", "]<space>", "o<esc>k", { expr = true, desc = "Add empty line below" })
+
 -- commenting
 map("n", "gco", "o<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>", { desc = "Add Comment Below" })
 map("n", "gcO", "O<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>", { desc = "Add Comment Above" })
 
 -- quickfix list
 map("n", "<leader>q", function()
-  local success, err = pcall(vim.fn.getqflist({ winid = 0 }).winid ~= 0 and vim.cmd.cclose or vim.cmd.copen)
+	local success, err = pcall(vim.fn.getqflist({ winid = 0 }).winid ~= 0 and vim.cmd.cclose or vim.cmd.copen)
 end, { desc = "Quickfix List" })
 map("n", "[q", vim.cmd.cprev, { desc = "Previous Quickfix" })
 map("n", "]q", vim.cmd.cnext, { desc = "Next Quickfix" })
 
 -- explorer
-map("n", "<leader>e", '<Cmd>lua MiniFiles.open(vim.api.nvim_buf_get_name(0))<CR>', { desc = "Open file explorer" })
+map("n", "<leader>e", "<Cmd>lua MiniFiles.open(vim.api.nvim_buf_get_name(0))<CR>", { desc = "Open file explorer" })
 
 -- diagnostic
 local diagnostic_goto = function(next, severity)
-  return function()
-    vim.diagnostic.jump({
-      count = (next and 1 or -1) * vim.v.count1,
-      severity = severity and vim.diagnostic.severity[severity] or nil,
-      float = true,
-    })
-  end
+	return function()
+		vim.diagnostic.jump({
+			count = (next and 1 or -1) * vim.v.count1,
+			severity = severity and vim.diagnostic.severity[severity] or nil,
+			float = true,
+		})
+	end
 end
 map("n", "<leader>l", vim.diagnostic.open_float, { desc = "Line Diagnostics" })
 map("n", "]d", diagnostic_goto(true), { desc = "Next Diagnostic" })

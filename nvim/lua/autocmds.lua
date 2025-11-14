@@ -4,26 +4,43 @@ local autocmd = require("utils").autocmd
 local augroup = require("utils").augroup
 
 autocmd("TextYankPost", {
-  desc = "Highlight the yanked text for a specified time.",
-  group = augroup("yank_highlight"),
-  callback = function()
-    vim.highlight.on_yank({ timeout = 200 }) -- Keep the highlight for 250ms after yanking.
-  end,
+	desc = "Highlight the yanked text for a specified time.",
+	group = augroup("yank_highlight"),
+	callback = function()
+		vim.highlight.on_yank({ timeout = 200 }) -- Keep the highlight for 250ms after yanking.
+	end,
 })
 
 autocmd("BufWritePre", {
-  desc = "Trim training whitespace after writing the contents of a buffer",
-  group = augroup("trim_trailing_whitespace"),
-  pattern = "*",
-  command = "%s/\\s\\+$//e",
+	desc = "Trim training whitespace after writing the contents of a buffer",
+	group = augroup("trim_trailing_whitespace"),
+	pattern = "*",
+	command = "%s/\\s\\+$//e",
 })
 
--- autocmd("VimLeave", {
---   desc = "Unlock when nvim is unfocused for zellij",
---   group = augroup("zellij_navigation"),
---   pattern = "*",
---   command = "silent !zellij action switch-mode normal"
--- })
+autocmd("FocusLost", {
+	desc = "Unlock when nvim is unfocused for zellij",
+	pattern = "*",
+	command = "silent !zellij action switch-mode normal",
+})
+
+autocmd("VimLeave", {
+	desc = "Unlock when nvim is unfocused for zellij",
+	pattern = "*",
+	command = "silent !zellij action switch-mode normal",
+})
+
+autocmd("FocusGained", {
+	desc = "Lock zellij when nvim is focused",
+	pattern = "*",
+	command = "silent !zellij action switch-mode locked",
+})
+
+autocmd("VimEnter", {
+	desc = "Lock zellij when nvim is focused",
+	pattern = "*",
+	command = "silent !zellij action switch-mode locked",
+})
 
 -- autocmd("CmdlineEnter", {
 --   desc = "Apply highlights during search and replace",
@@ -172,5 +189,3 @@ autocmd("BufWritePre", {
 --   pattern = "*.vue",
 --   command = "0r ~/.config/nvim/skeletons/sfc.vue",
 -- })
-
-
