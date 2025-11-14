@@ -18,12 +18,12 @@ autocmd("BufWritePre", {
   command = "%s/\\s\\+$//e",
 })
 
-autocmd("VimLeave", {
-  desc = "Unlock when nvim is unfocused for zellij",
-  group = augroup("zellij_navigation"),
-  pattern = "*",
-  command = "silent !zellij action switch-mode normal"
-})
+-- autocmd("VimLeave", {
+--   desc = "Unlock when nvim is unfocused for zellij",
+--   group = augroup("zellij_navigation"),
+--   pattern = "*",
+--   command = "silent !zellij action switch-mode normal"
+-- })
 
 -- autocmd("CmdlineEnter", {
 --   desc = "Apply highlights during search and replace",

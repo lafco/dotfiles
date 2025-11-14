@@ -3,7 +3,8 @@ return {
   config = function()
     require('mini.icons').setup()
     require('mini.files').setup()
-    require('mini.completion').setup()
+    require('mini.pairs').setup()
+    require('mini.indentscope').setup()
     -- Better Around/Inside textobjects
     --  - va)  - [V]isually select [A]round [)]paren
     --  - yinq - [Y]ank [I]nside [N]ext [Q]uote
@@ -28,10 +29,5 @@ return {
         line_up = '<M-k>',
       }
     })
-    -- local statusline = require 'mini.statusline'
-    -- statusline.setup { use_icons = vim.g.have_nerd_font }
-    -- statusline.section_location = function()
-    --   return '%2l:%-2v'
-    -- end
   end,
 }

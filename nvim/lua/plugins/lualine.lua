@@ -9,7 +9,37 @@ return {
     config = function()
       require("mini.icons").setup()
       require("mini.icons").mock_nvim_web_devicons()
-      local colors = require("tokyonight.colors").setup()
+      
+      local function get_current_colorscheme_colors()
+        local colorscheme = vim.g.colors_name or "default"
+        
+        if string.find(colorscheme, "tokyonight") then
+          return require("tokyonight.colors").setup()
+        elseif string.find(colorscheme, "catppuccin") then
+          local palette = require("catppuccin.palettes").get_palette()
+          -- Map catppuccin colors to tokyonight-like structure
+          return {
+            bg = palette.base,
+            text = palette.text,
+            blue = palette.blue,
+            black = palette.crust,
+            yellow = palette.yellow,
+            bg_float = palette.mantle
+          }
+        else
+          -- Fallback colors
+          return {
+            bg = "#1e1e2e",
+            text = "#cdd6f4",
+            blue = "#89b4fa",
+            black = "#11111b",
+            yellow = "#f9e2af",
+            bg_float = "#181825"
+          }
+        end
+      end
+      
+      local colors = get_current_colorscheme_colors()
       require('lualine').setup({
         options = {
           theme = {
