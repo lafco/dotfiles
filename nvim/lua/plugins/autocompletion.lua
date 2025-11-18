@@ -80,19 +80,19 @@ return {
         --   Information = "",
         --   Hint = "󰌶",
         -- },
-        draw = function(entry, ctx)
-          local text = entry.label or entry.word or ""
-          local icon = ctx.kind_icon or ""
+        -- draw = function(entry, ctx)
+        --   local text = entry.label or entry.word or ""
+        --   local icon = ctx.kind_icon or ""
           
-          -- Format as: "text icon"
-          return string.format("%s %s", text, icon)
-        end,
+        --   -- Format as: "text icon"
+        --   return string.format("%s %s", text, icon)
+        -- end,
       },
       completion = {
         documentation = { auto_show = false, auto_show_delay_ms = 1000 },
-        menu = {
-          max_items = 5,
-        }
+        -- menu = {
+        --   max_items = 5,
+        -- }
       },
       sources = {
         default = { 'lsp', 'path', 'snippets', 'lazydev' },

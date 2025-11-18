@@ -11,12 +11,12 @@ autocmd("TextYankPost", {
 	end,
 })
 
-autocmd("BufWritePre", {
-	desc = "Trim training whitespace after writing the contents of a buffer",
-	group = augroup("trim_trailing_whitespace"),
-	pattern = "*",
-	command = "%s/\\s\\+$//e",
-})
+-- autocmd("BufWritePre", {
+-- 	desc = "Trim training whitespace after writing the contents of a buffer",
+-- 	group = augroup("trim_trailing_whitespace"),
+-- 	pattern = "*",
+-- 	command = "%s/\\s\\+$//e",
+-- })
 
 autocmd("FocusLost", {
 	desc = "Unlock when nvim is unfocused for zellij",

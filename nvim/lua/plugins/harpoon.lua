@@ -17,7 +17,7 @@ return {
         require("telescope.pickers").new({}, {
             prompt_title = "Harpoon",
             finder = require("telescope.finders").new_table({
-                results = file_paths,
+              results = file_paths,
             }),
             previewer = conf.file_previewer({}),
             sorter = conf.generic_sorter({}),
@@ -34,6 +34,7 @@ return {
       map("n", "<A-6>", function() harpoon:list():select(6) end)
       map("n", "<A-p>", function() harpoon:list():prev() end)
       map("n", "<A-n>", function() harpoon:list():next() end)
+      map("n", "<A-x>", function() harpoon:list():remove() end)
     end
   }
 }
