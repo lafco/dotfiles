@@ -12,14 +12,6 @@ return {
 			{ "<leader>fz", "<cmd>Telescope zoxide list<cr>", desc = "Directories" },
 			{ "<leader>fu", "<cmd>Telescope undo<cr>", desc = "Undo" },
 
-			{ "<leader>gc", "<cmd>Telescope advanced_git_search changed_on_branch<cr>", desc = "Changed on current branch" },
-			{ "<leader>gr", "<cmd>Telescope advanced_git_search checkout_reflog<cr>", desc = "Checkout reflog" },
-			{ "<leader>gb", "<cmd>Telescope advanced_git_search diff_branch_file<cr>", desc = "Local branches" },
-			{ "<leader>gl", "<cmd>Telescope advanced_git_search diff_commit_line<cr>", desc = "Diff line commit" },
-			{ "<leader>gf", "<cmd>Telescope advanced_git_search diff_commit_file<cr>", desc = "List file commit" },
-			{ "<leader>gs", "<cmd>Telescope advanced_git_search search_log_content_file<cr>", desc = "File previous commits" },
-			-- { '<leader>gg', '<cmd>Telescope advanced_git_search search_log_content<cr>', desc = 'List all commits' },
- 
 			{ "<leader>r", "<cmd>Telescope yank_history<cr>", mode = { "n", "x" }, desc = "Registers" },
 			{ "<leader>k", "<cmd>Telescope keymaps<cr>", desc = "Keymaps" },
       { '<leader>fm', '<cmd>Telescope marks<cr>', desc = 'List marks' },
@@ -92,7 +84,6 @@ return {
 			require("telescope").load_extension("undo")
 			require("telescope").load_extension("zoxide")
 			require("telescope").load_extension("yank_history")
-			require("telescope").load_extension("advanced_git_search")
 		end,
 	},
 }
