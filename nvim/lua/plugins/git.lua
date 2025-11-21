@@ -18,40 +18,21 @@ return {
 				local gitsigns = require("gitsigns")
 				local map = require("utils").map
 
-				-- Navigation
-				map("n", "]c", function()
-					if vim.wo.diff then
-						vim.cmd.normal({ "]c", bang = true })
-					else
-						gitsigns.nav_hunk("next")
-					end
-				end, { desc = "Jump to next git change" })
-				map("n", "[c", function()
-					if vim.wo.diff then
-						vim.cmd.normal({ "[c", bang = true })
-					else
-						gitsigns.nav_hunk("prev")
-					end
-				end, { desc = "Jump to previous git change" })
+				-- hunk navigation
+				map("n", "]c", function() gitsigns.nav_hunk("next") end, { desc = "Jump to next git change" })
+				map("n", "[c", function() gitsigns.nav_hunk("prev") end, { desc = "Jump to previous git change" })
 
 				-- visual mode
-				map("v", "<leader>hs", function()
-					gitsigns.stage_hunk({ vim.fn.line("."), vim.fn.line("v") })
-				end, { desc = "git stage hunk" })
-				map("v", "<leader>hr", function()
-					gitsigns.reset_hunk({ vim.fn.line("."), vim.fn.line("v") })
-				end, { desc = "git reset hunk" })
+				map("v", "<leader>hs", function() gitsigns.stage_hunk({ vim.fn.line("."), vim.fn.line("v") }) end, { desc = "git stage hunk" })
+				map("v", "<leader>hr", function() gitsigns.reset_hunk({ vim.fn.line("."), vim.fn.line("v") }) end, { desc = "git reset hunk" })
 
 				-- normal mode
 				map("n", "<leader>hs", gitsigns.stage_hunk, { desc = "Stage hunk" })
+				map("n", "<leader>hu", gitsigns.undo_stage_hunk, { desc = "Undo stage hunk" })
 				map("n", "<leader>hr", gitsigns.reset_hunk, { desc = "Reset hunk" })
 				map("n", "<leader>hR", gitsigns.reset_buffer, { desc = "Reset buffer" })
 				map("n", "<leader>hp", gitsigns.preview_hunk, { desc = "Preview hunk" })
 				map("n", "<leader>hb", gitsigns.blame_line, { desc = "Blame line" })
-				map("n", "<leader>hd", gitsigns.diffthis, { desc = "Diff against index" })
-				map("n", "<leader>gd", function()
-					gitsigns.diffthis("@")
-				end, { desc = "Diff against last commit" })
 
 				-- Toggles
 				map("n", "<leader>tb", gitsigns.toggle_current_line_blame, { desc = "Git show blame line" })
