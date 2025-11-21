@@ -1,28 +1,5 @@
 return {
 	{
-		"folke/tokyonight.nvim",
-		priority = 1000,
-		config = function()
-			require("tokyonight").setup({
-				on_highlights = function(hl, colors)
-					hl.TelescopeSelectionCaret = { fg = colors.red }
-					hl.TelescopePromptPrefix = { fg = colors.red, bg = colors.black }
-					hl.TelescopeMatching = { fg = colors.red }
-					hl.TelescopeSelection = { fg = colors.blue, bg = colors.bg_float }
-					hl.TelescopePromptNormal = { bg = colors.black }
-					hl.TelescopePromptBorder = { bg = colors.black, fg = colors.black }
-					hl.TelescopePromptTitle = { fg = colors.text, bg = colors.red }
-					hl.TelescopeResultsNormal = { bg = colors.bg_float }
-					hl.TelescopeResultsBorder = { bg = colors.bg_float, fg = colors.bg_float }
-					hl.TelescopeResultsTitle = { fg = colors.black, bg = colors.green }
-					hl.TelescopePreviewNormal = { bg = colors.black }
-					hl.TelescopePreviewBorder = { bg = colors.black, fg = colors.black }
-					hl.TelescopePreviewTitle = { fg = colors.black, bg = colors.hint }
-				end,
-			})
-		end,
-	},
-	{
 		"catppuccin/nvim",
 		name = "catppuccin",
 		priority = 1000,
@@ -60,8 +37,6 @@ return {
 					}
 				end,
 			})
-			-- Set default colorscheme - change this to switch between themes
-			-- Options: "tokyonight-moon", "tokyonight-storm", "tokyonight-night", "tokyonight-day", "catppuccin"
 			vim.cmd.colorscheme("catppuccin")
 		end,
 	},
